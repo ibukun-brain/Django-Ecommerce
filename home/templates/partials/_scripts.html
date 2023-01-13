@@ -1,0 +1,30 @@
+{% load static %}
+
+<!-- jquery -->
+<script src="{% static 'js/jquery-2.0.0.min.js' %}" type="text/javascript"></script>
+<!-- bootstrap -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}" type="text/javascript"></script>
+<!-- custom javascript -->
+<script src="{% static 'js/script.js' %}" type="text/javascript"></script>
+
+<script type="text/javascript">
+/// some script
+	const categories = document.querySelectorAll("a[href='?category={{category_slug}}']");
+	categories.forEach((category)=>{
+		category.classList.add("text-primary")
+	})
+
+	const url = document.querySelectorAll("a[href='{{request.path}}']")
+	url.forEach((link)=>{
+		link.classList.add("text-primary")
+	})
+
+// jquery ready start
+$(document).ready(function() {
+	// jQuery code
+	$(".alert").delay(10000).slideUp(200, function () {
+		$(this).alert('close');
+	  });
+}); 
+// jquery end
+</script>

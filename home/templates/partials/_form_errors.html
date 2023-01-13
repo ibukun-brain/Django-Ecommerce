@@ -1,0 +1,26 @@
+{% if redirect_field_value %}
+<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+{% endif %}
+
+{{ form.media }}
+{% csrf_token %}
+
+{% if form.errors %}
+<div class="row">
+  <div class="col-sm-10 col-md-8 col-lg-12">
+
+    <div class="alert alert-danger alert-dismissible align-items-center fade show rounded-3">
+      {% for field in form %}
+      {% for error in field.errors %}
+      <span class="text-sm"><i class="fa fa-times"></i>&nbsp;&nbsp;{{ field.label }}: {{ error|escape }}</span><br>
+      {% endfor %}
+      {% endfor %}
+
+      {% for error in form.non_field_errors %}
+      <i class="text-sm">{{ error|escape }}</i><br>
+      {% endfor %}
+      <button type="button" class="btn-close text-danger" data-bs-dismiss="alert" aria-label="Close" style="opacity: 1"></button>
+    </div>
+  </div>
+</div>
+{% endif %}

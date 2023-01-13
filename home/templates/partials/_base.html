@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="max-age=604800" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% include 'partials/_stylesheets.html' %}
+{% block stylesheets %}{% endblock stylesheets %}
+<title>GreatKart | {% block title %}{% endblock title %}</title>
+
+</head>
+<body>
+    {% include 'partials/_navbar.html' %}
+
+    {% block body %}
+    
+    {% endblock body %}
+
+    {% include 'partials/_footer.html' %}
+</body>
+    {% include 'partials/_scripts.html' %}
+    {% block scripts %}
+    {% endblock scripts %}
+
+</html>

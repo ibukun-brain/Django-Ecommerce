@@ -1,0 +1,16 @@
+{% if messages %} 
+<div class="row">
+  <div class="col-md-12 justify-content-center mb-3">
+    {% if messages %}
+      {% for message in messages %}
+        {% if forloop.counter == messages|length %}
+        <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close mt-1" data-bs-dismiss="alert" aria-label="Close" style="opacity: 1"></button>
+        </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endif %}
