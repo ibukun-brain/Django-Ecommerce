@@ -8,7 +8,7 @@ from django.template.defaultfilters import pluralize
 from buyit.utils.models import NamedTimeBasedModel, TimeBasedModel
 from buyit.utils.media import store_image_upload_path
 from buyit.utils.choices import PaymentChoices
-from buyit.utils.strings import generate_ref_no
+# from buyit.utils.strings import generate_ref_no
 
 
 # Create your models here.
@@ -35,6 +35,12 @@ class Product(NamedTimeBasedModel):
     stock = models.PositiveSmallIntegerField(default=0)
     is_available = models.BooleanField(default=True)
     categories = models.ManyToManyField('store.Category', blank=True)
+    available_colors = models.ManyToManyField(
+        'store.ColorVariation', blank=True,
+    )
+    available_sizes = models.ManyToManyField(
+        'store.SizeVariation', blank=True,
+    )
 
     def get_absolute_url(self):
             return reverse("store:product-detail", kwargs={"slug": self.slug})
@@ -49,6 +55,19 @@ class Product(NamedTimeBasedModel):
         
         return f"{settings.STATIC_URL}/images/banners/1.jpg"
     
+
+class SizeVariation(NamedTimeBasedModel):
+
+    def __str__(self):
+        return f"{self.name}"
+    
+class ColorVariation(NamedTimeBasedModel):
+
+    def __str__(self):
+        return f"{self.name}"
+    
+
+
 class Order(TimeBasedModel):
     user = auto_prefetch.ForeignKey(
         'home.CustomUser',
@@ -75,14 +94,19 @@ class Order(TimeBasedModel):
         null=True,
         on_delete=models.SET_NULL
     )
+    reference_number = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return self.reference_number
     
-    @property
-    # use signals to handle this better or properly
-    def reference_number(self):
-        return f"ORDER-{generate_ref_no()}"
+    # @property
+    # # use signals to handle this better or properly
+    # def reference_number(self):
+    #     return f"ORDER-{generate_ref_no()}"
     
     @property
     def get_overall_price(self):
@@ -93,20 +117,34 @@ class Order(TimeBasedModel):
         return total
     
 
-
 class OrderItem(TimeBasedModel):
     product = auto_prefetch.ForeignKey(
         'store.Product',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
     order = auto_prefetch.ForeignKey(
         'store.Order',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
     )
     quantity = models.PositiveSmallIntegerField(
         default=1,
         blank=True
     )
+    color = auto_prefetch.ForeignKey(
+        'store.ColorVariation',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    size = auto_prefetch.ForeignKey(
+        'store.SizeVariation',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    
 
     @property
     def get_total(self):
@@ -115,7 +153,7 @@ class OrderItem(TimeBasedModel):
     
 
     def __str__(self):
-         return f"{self.product} - {self.quantity}{pluralize(self.quantity)}"
+         return f"{self.product} x {self.quantity}"
     
 
 class Payment(TimeBasedModel):

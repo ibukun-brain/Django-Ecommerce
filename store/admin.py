@@ -1,8 +1,20 @@
 from django.contrib import admin
 from store.models import (
     Category, Order, OrderItem, 
-    Payment, Product
+    Payment, Product, SizeVariation,
+    ColorVariation
 )
+@admin.register(SizeVariation)
+class SizeVariationAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+    list_filter = ['created_at']
+
+@admin.register(ColorVariation)
+class ColorVariationAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+    list_filter = ['created_at']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -10,13 +22,15 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ['created_at','updated_at']
     search_fields = ['name']
 
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'price_currency', 'stock', 'updated_at']
     list_filter  = ['created_at', 'is_available']
     date_hierarchy = 'created_at'
     search_fields = ['name']
-    filter_horizontal = ['categories']
+    filter_horizontal = ['categories', 'available_sizes', 'available_colors']
+    
 
     def price_currency(self, object):
         return f"₦{object.price}"
@@ -42,12 +56,12 @@ class Order(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'quantity']
-    list_select_related = ['product', 'order']
+    list_display = ['product', 'order', 'quantity', 'color', 'size']
+    list_select_related = ['product', 'order', 'color', 'size']
     autocomplete_fields = ['product', 'order']
     list_filter = ['created_at', 'updated_at']
     search_fields = ['product__name', 'order__name']
-    autocomplete_fields = ['product', 'order']
+    autocomplete_fields = ['product', 'order', 'color', 'size']
     date_hierarchy = 'created_at'
 
 

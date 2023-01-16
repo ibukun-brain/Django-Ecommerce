@@ -2,7 +2,10 @@ import uuid
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.text import slugify
-from store.models import Category, Product
+from store.models import Category, Product, Order
+
+from buyit.utils.strings import generate_ref_no
+
 
 def create_slug(model, instance, new_slug=None):
     slug = slugify(instance.name)
@@ -38,3 +41,8 @@ def pre_save_product_slug_reciever(sender, instance, **kwargs):
             instance.slug = create_slug(Product, instance)
     except Product.DoesNotExist:
         pass
+
+@receiver(post_save, sender=Order)
+def post_save_generate_order_ref_no(sender, created, instance, **kwargs):
+    if created:
+        instance.reference_number = f"ORDER-{generate_ref_no()}"

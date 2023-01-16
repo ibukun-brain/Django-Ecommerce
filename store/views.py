@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -24,7 +25,14 @@ class ProductListView(ListView):
     def get_queryset(self):
         request = self.request
         queryset = Product.items.filter(is_available=True)
-        category_slug = request.GET.get('category') 
+        category_slug = request.GET.get('category')
+        q = request.GET.get('q')
+        if q != None or q == '':
+            queryset = queryset.filter(
+                Q(name__icontains=q) |
+                Q(description__icontains=q)
+            ).distinct()
+
         if category_slug != None or category_slug == '':
             queryset = queryset.filter(categories__slug=category_slug)
 
@@ -49,10 +57,19 @@ class ProductDetailView(FormView):
     def get_object(self):
         return get_object_or_404(Product, slug=self.kwargs['slug'])
     
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(ProductDetailView, self).get_form_kwargs(*args, **kwargs)
+        kwargs['product_id'] = self.get_object().id
+        return kwargs
+
     def form_valid(self, form):
         order = get_or_set_order_session(self.request)
         product = self.get_object()
-        order_filter = order.orderitem_set.filter(product=product)
+        order_filter = order.orderitem_set.filter(
+            product=product,
+            color=form.cleaned_data['color'],
+            size=form.cleaned_data['size']
+        )
         if order_filter.exists():
             order = order_filter.first()
             # order.quantity = int(form.cleaned_data['quantity'])

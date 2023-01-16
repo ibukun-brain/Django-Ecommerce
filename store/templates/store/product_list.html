@@ -5,7 +5,15 @@
 <!-- ========================= SECTION PAGETOP ========================= -->
 <section class="section-pagetop bg">
     <div class="container">
-        <h2 class="title-page">Our Store</h2>
+        {% if not products %}
+            <h2 class="text-center">No result found!</h2>
+        {% else %}
+            {% if 'q' in request.build_absolute_uri %}
+                <h2 class="title-page">Search Result</h2>
+            {% else %}
+                <h2 class="title-page">Our Store</h2>
+            {% endif %}
+
         
     </div> <!-- container //  -->
     </section>
@@ -156,8 +164,10 @@
         </main> <!-- col.// -->
     
     </div>
-    
+    {% endif %}
+
     </div> <!-- container .//  -->
     </section>
+
     <!-- ========================= SECTION CONTENT END// ========================= -->
 {% endblock body %}

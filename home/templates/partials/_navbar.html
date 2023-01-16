@@ -16,11 +16,11 @@
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"> USD </a>
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"> NGN </a>
                     <ul class="dropdown-menu small">
                         <li><a class="dropdown-item" href="#">EUR</a></li>
-                        <li><a class="dropdown-item" href="#">AED</a></li>
-                        <li><a class="dropdown-item" href="#">RUBL </a></li>
+                        <li><a class="dropdown-item" href="#">USD</a></li>
+                        <li><a class="dropdown-item" href="#">GBP </a></li>
                     </ul>
                 </li>
             </ul>
@@ -43,7 +43,7 @@
         <div class="col-lg col-sm col-md col-6 flex-grow-0">
             <div class="category-wrap dropdown d-inline-block float-right">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> 
-                    <i class="fa fa-bars"></i>All category
+                    <i class="fa fa-bars"></i> All category
                 </button>
                 <div class="dropdown-menu">
                     {% for category in categories %}
@@ -54,9 +54,9 @@
         </div> <!-- col.// -->
         <a href="{% url 'store:product-list' %}" class="btn btn-outline-primary">Store</a>
         <div class="col-lg  col-md-6 col-sm-12 col">
-            <form action="#" class="search">
+            <form action="{% url 'store:product-list' %}" class="search">
                 <div class="input-group w-100">
-                    <input type="text" class="form-control" style="width:60%;" placeholder="Search">
+                    <input type="text" class="form-control" name="q" style="width:60%;" placeholder="Search">
                     
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="submit">
@@ -68,12 +68,22 @@
         </div> <!-- col.// -->
         <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
                     <div class="d-flex justify-content-end mb-3 mb-lg-0">
+                        
+
                         <div class="widget-header">
-                            <small class="title text-muted">Welcome guest!</small>
-                            <div> 
-                                <a href="./signin.html">Sign in</a> <span class="dark-transp"> | </span>
-                                <a href="./register.html"> Register</a>
-                            </div>
+                            {% if request.user.is_authenticated %}
+                                <small class="title text-muted">Welcome {{request.user}}!</small>
+                                <div> 
+                                    <a href="{% url 'account_logout' %}">Sign out</a> 
+                                </div>
+                            {% else %}
+                                <small class="title text-muted">Welcome guest!</small>
+                                <div> 
+                                    <a href="{% url 'account_login' %}">Sign in</a> <span class="dark-transp"> | </span>
+                                    <a href="{% url 'account_signup' %}"> Register</a>
+                                </div>
+                            {% endif %}
+
                         </div>
                         <a href="{% url 'store:carts' %}" class="widget-header pl-3 ml-3">
                             <div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>

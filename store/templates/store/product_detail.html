@@ -30,55 +30,71 @@
     
     
     <hr>
+    {% if not product.stock <= 0 %}
+
+    <form method="post">
+      {% csrf_token %}
+      {% include 'partials/_form_errors.html' %}
+
         <div class="row">
+          {% if product.available_colors.count > 0 %}
             <div class="item-option-select">
                 <h6>Choose Color</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+                  {% for radio in form.color %}
                   <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Silver
+                    <input type="radio" name="color" required>{{radio.choice_label}}
                   </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color" > Gray
-                  </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color checked"> Gold
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Black
-                  </label>
+                  {% endfor %}
+
                 </div> 
             </div>
+          {% else %}
+            <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+              {% for radio in form.color %}
+              <label class="btn btn-light">
+                <input type="radio" name="color" hidden>{{radio.choice_label}}
+              </label>
+              {% endfor %}
+
+            </div> 
+          {% endif %}
+            
         </div> <!-- row.// -->
+
         <div class="row">
+          {% if product.available_sizes.count > 0 %}
             <div class="item-option-select">
                 <h6>Select Size</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+                  
+                  {% for radio in form.size %}
                   <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> S
+                    <input type="radio" name="size" required>{{radio.choice_label}}
                   </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color" checked> M
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> L
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> XL
-                  </label>
+                  {% endfor %}
+
                 </div> 
             </div>
+            {% else %}
+            <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+              {% for radio in form.size %}
+              <label class="btn btn-light">
+                <input type="radio" name="size" hidden>{{radio.choice_label}}
+              </label>
+              {% endfor %}
+            </div>         
+            {% endif %}
+
         </div> <!-- row.// -->
+        <input type="hidden" name="{{form.quantity.name}}" value="{{form.quantity.value}}" />
+        <button class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+      </form>
+
         <hr>
-        {% if product.stock <= 0 %}
+        {% else %}
             <h5 class="text-danger">Out of stock</h5>
-          {% else %}
-            <form method="post">
-              {% csrf_token %}
-                {% include 'partials/_form_errors.html' %}
-                <input type="hidden" name="{{form.quantity.name}}" value="{{form.quantity.value}}" />
-                <button class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
-            </form>
-          {% endif %}
+        {% endif %}
     </article> <!-- product-info-aside .// -->
             </main> <!-- col.// -->
         </div> <!-- row.// -->
