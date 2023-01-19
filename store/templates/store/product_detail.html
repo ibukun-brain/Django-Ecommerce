@@ -23,7 +23,7 @@
     <h2 class="title">{{product.name}}</h2>
     
     <div class="mb-3"> 
-        <var class="price h4">₦{{product.price}}</var> 
+        <h2 class="price h4">₦{{product.price}}</h2> 
     </div> 
     
     <p>{{product.description}}</p>
@@ -37,23 +37,28 @@
       {% include 'partials/_form_errors.html' %}
 
         <div class="row">
-          {% if product.available_colors.count > 0 %}
+          {% if product.available_colors.count >= 1%}
             <div class="item-option-select">
                 <h6>Choose Color</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  {% for radio in form.color %}
+                  {% comment %} {% for radio in form.color %} {% endcomment %}
+                  {% for color in product.available_colors.all %}
                   <label class="btn btn-light">
-                    <input type="radio" name="color" required>{{radio.choice_label}}
+                    {% comment %} {{radio}} {% endcomment %}
+                    <input type="radio" name="color" required value="{{forloop.counter}}" class="form-control" id="id_size_{{forloop.counter}}">
+                    {{color.name}}
                   </label>
                   {% endfor %}
+                  {% comment %} <label class="btn btn-light"> {% endcomment %}
+                  {% comment %} {% endfor %} {% endcomment %}
 
                 </div> 
             </div>
           {% else %}
             <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
               {% for radio in form.color %}
-              <label class="btn btn-light">
-                <input type="radio" name="color" hidden>{{radio.choice_label}}
+              <label class="btn btn-light" for={# {{radio.id_for_label}} #}>
+                <input type="radio" name="size" hidden class="choice">{# {{radio.choice_label}} #}
               </label>
               {% endfor %}
 
@@ -63,14 +68,16 @@
         </div> <!-- row.// -->
 
         <div class="row">
-          {% if product.available_sizes.count > 0 %}
+          {% if product.available_sizes.count >= 1 %}
             <div class="item-option-select">
                 <h6>Select Size</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
                   
-                  {% for radio in form.size %}
+                  {% for size in product.available_sizes.all %}
                   <label class="btn btn-light">
-                    <input type="radio" name="size" required>{{radio.choice_label}}
+                    {% comment %} {{radio}} {% endcomment %}
+                    <input type="radio" name="size" required value="{{forloop.counter}}" class="form-control" id="id_size_{{forloop.counter}}">
+                    {{size.name}}
                   </label>
                   {% endfor %}
 
@@ -80,7 +87,7 @@
             <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
               {% for radio in form.size %}
               <label class="btn btn-light">
-                <input type="radio" name="size" hidden>{{radio.choice_label}}
+                {{radio}}
               </label>
               {% endfor %}
             </div>         
@@ -137,4 +144,19 @@
     
     </div> <!-- container .//  -->
     </section>
+
 {% endblock body %}
+{% block scripts %}
+      <script>
+        document.addEventListener('DOMContentLoaded', (e) => {
+          radioButton = document.querySelectorAll('.choice')
+          if (radioButton.length > 0){
+            radioButton.forEach((radio) => {
+              radio.removeAttribute('required')
+              console.log(worked)
+            })
+          } 
+        })
+          
+      </script>
+    {% endblock scripts %}

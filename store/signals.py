@@ -42,7 +42,8 @@ def pre_save_product_slug_reciever(sender, instance, **kwargs):
     except Product.DoesNotExist:
         pass
 
-@receiver(post_save, sender=Order)
-def post_save_generate_order_ref_no(sender, created, instance, **kwargs):
-    if created:
+@receiver(pre_save, sender=Order)
+def post_save_generate_order_ref_no(sender,  instance, **kwargs):
+    if not instance.reference_number:
         instance.reference_number = f"ORDER-{generate_ref_no()}"
+        # order.save()

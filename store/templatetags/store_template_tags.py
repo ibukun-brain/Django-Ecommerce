@@ -9,3 +9,4 @@ def order_item_count(request):
     count = order.orderitem_set.count()
 
     return count
+    pass

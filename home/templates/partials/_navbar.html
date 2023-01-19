@@ -8,9 +8,9 @@
           <div class="collapse navbar-collapse" id="navbarTop4">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item dropdown">
-                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">   Language </a>
+                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">English</a>
                     <ul class="dropdown-menu small">
-                        <li><a class="dropdown-item" href="#">English</a></li>
+                        <li><a class="dropdown-item" href="#">French</a></li>
                         <li><a class="dropdown-item" href="#">Arabic</a></li>
                         <li><a class="dropdown-item" href="#">Russian </a></li>
                     </ul>
@@ -56,8 +56,7 @@
         <div class="col-lg  col-md-6 col-sm-12 col">
             <form action="{% url 'store:product-list' %}" class="search">
                 <div class="input-group w-100">
-                    <input type="text" class="form-control" name="q" style="width:60%;" placeholder="Search">
-                    
+                    <input type="text" class="form-control" name="q" style="width:60%;" value="{{request.GET.q|default:""}}"placeholder="Search">
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="submit">
                         <i class="fa fa-search"></i>

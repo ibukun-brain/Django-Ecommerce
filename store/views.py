@@ -55,7 +55,10 @@ class ProductDetailView(FormView):
     success_url = reverse_lazy('store:carts')
 
     def get_object(self):
-        return get_object_or_404(Product, slug=self.kwargs['slug'])
+        return get_object_or_404(
+            Product, 
+            slug=self.kwargs['slug']
+        )
     
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = super(ProductDetailView, self).get_form_kwargs(*args, **kwargs)
@@ -95,9 +98,24 @@ class CartView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(CartView, self).get_context_data(**kwargs)
+ 
         context['order'] = get_or_set_order_session(self.request)
         return context
 
+# class CartView(ListView):
+#     template_name = 'store/cart.html'
+#     context_object_name = 'order'
+#     # model = OrderItem
+
+#     def  get_queryset(self):
+#         queryset =  get_or_set_order_session(self.request)
+#         return queryset
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(CartView, self).get_context_data(**kwargs)
+    #     context['order'] = get_or_set_order_session(self.request)
+    #     return context
+    
 class IncreaseQuantityView(View):
 
     def get(self, request, *args, **kwargs):

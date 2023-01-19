@@ -3,10 +3,10 @@ from django.urls import reverse_lazy
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = reverse_lazy(
-    "home:index")
+    "account_login")
 
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy(
-    "home:update-account"
+    "home:index"
 )
 
 ACCOUNT_EMAIL_MAX_LENGTH = 40
@@ -23,7 +23,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 
-ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy("account_login")
+ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy("home:index")
 
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 
@@ -31,7 +31,7 @@ ACCOUNT_SESSION_REMEMBER = True
 
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
-ACCOUNT_SIGNUP_REDIRECT_URL = reverse_lazy("home:update-account")
+ACCOUNT_SIGNUP_REDIRECT_URL = reverse_lazy("home:index")
 
 ACCOUNT_UNIQUE_EMAIL = True
 

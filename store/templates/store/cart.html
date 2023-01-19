@@ -34,7 +34,7 @@
             <figure class="itemside align-items-center">
                 <div class="aside"><img src="{{order_item.product.image_url}}" class="img-sm"></div>
                 <figcaption class="info">
-                    <a href="{{order_item.product.get_absolute}}" class="title text-dark">{{order_item.product.name}}</a>
+                    <a href="{{order_item.product.get_absolute_url}}" class="title text-dark">{{order_item.product.name}}</a>
                     <p class="text-muted small">{% if order_item.size %}Size: {{order_item.size.name}}{% endif %} <br> {% if order_item.size %}Color: {{order_item.color.name}}{% endif %}</p>
                 </figcaption>
             </figure>

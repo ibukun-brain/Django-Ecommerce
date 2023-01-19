@@ -12,15 +12,18 @@
 </head>
 <body>
     {% include 'partials/_navbar.html' %}
+    <main class="main-container">
+        {% block body %}
+        
+        {% endblock body %}
+    </main>
 
-    {% block body %}
-    
-    {% endblock body %}
 
     {% include 'partials/_footer.html' %}
 </body>
-    {% include 'partials/_scripts.html' %}
     {% block scripts %}
     {% endblock scripts %}
+    {% include 'partials/_scripts.html' %}
+
 
 </html>

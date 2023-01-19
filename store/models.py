@@ -8,7 +8,7 @@ from django.template.defaultfilters import pluralize
 from buyit.utils.models import NamedTimeBasedModel, TimeBasedModel
 from buyit.utils.media import store_image_upload_path
 from buyit.utils.choices import PaymentChoices
-# from buyit.utils.strings import generate_ref_no
+from buyit.utils.strings import generate_ref_no
 
 
 # Create your models here.
@@ -100,8 +100,14 @@ class Order(TimeBasedModel):
         null=True,
     )
 
+    # def save(self, *args, **kwargs):
+    #     if not self.reference_number:
+    #         self.reference_number = f"ORDER-{generate_ref_no()}"
+
+    #     super().save()
+
     def __str__(self):
-        return self.reference_number
+        return str(self.reference_number)
     
     # @property
     # # use signals to handle this better or properly
