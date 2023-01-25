@@ -35,5 +35,10 @@ urlpatterns = [
     view=store_views.RemoveOrderItemView.as_view(),
     name='remove-orderitem'
     ),
+    path(
+    route='checkout/',
+    view=store_views.CheckOutView.as_view(),
+    name='checkout'
+    ),
     
 ]

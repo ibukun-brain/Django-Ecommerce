@@ -58,9 +58,9 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ['user', 'address_line_1', 'address_line_2','city', 'zip_code']
+    list_display = ['user', 'address_line_1', 'address_line_2','city', 'state', 'zip_code']
     list_select_related = ['user']
-    list_filter = ['address_type', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
     date_hierarchy = 'created_at'
     autocomplete_fields = ['user']
     search_fields = ['user', 'address_line_1', 'address_line_2']

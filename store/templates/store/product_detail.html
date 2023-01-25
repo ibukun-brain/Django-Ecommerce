@@ -5,6 +5,9 @@
 {% block body %}
 <section class="section-content padding-y bg">
     <div class="container">
+      {% if product.available_sizes.count >= 1 %}
+          {% include 'store/partials/_variation_modal.html' %}
+      {% endif %}
     
     <!-- ============================ COMPONENT 1 ================================= -->
     <div class="card">
@@ -32,25 +35,21 @@
     <hr>
     {% if not product.stock <= 0 %}
 
-    <form method="post">
+    <form method="post" hx-post="" hx-target="#cartBtnContainer">
       {% csrf_token %}
       {% include 'partials/_form_errors.html' %}
-
-        <div class="row">
+        {% comment %} 
+          <div class="row">
           {% if product.available_colors.count >= 1%}
             <div class="item-option-select">
                 <h6>Choose Color</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  {% comment %} {% for radio in form.color %} {% endcomment %}
                   {% for color in product.available_colors.all %}
                   <label class="btn btn-light">
-                    {% comment %} {{radio}} {% endcomment %}
                     <input type="radio" name="color" required value="{{forloop.counter}}" class="form-control" id="id_size_{{forloop.counter}}">
                     {{color.name}}
                   </label>
                   {% endfor %}
-                  {% comment %} <label class="btn btn-light"> {% endcomment %}
-                  {% comment %} {% endfor %} {% endcomment %}
 
                 </div> 
             </div>
@@ -65,17 +64,17 @@
             </div> 
           {% endif %}
             
-        </div> <!-- row.// -->
+          </div> <!-- row.// --> 
+        {% endcomment %}
 
         <div class="row">
           {% if product.available_sizes.count >= 1 %}
             <div class="item-option-select">
-                <h6>Select Size</h6>
+                <h6>Variation Available</h6>
                 <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
                   
                   {% for size in product.available_sizes.all %}
-                  <label class="btn btn-light">
-                    {% comment %} {{radio}} {% endcomment %}
+                  <label class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter">
                     <input type="radio" name="size" required value="{{forloop.counter}}" class="form-control" id="id_size_{{forloop.counter}}">
                     {{size.name}}
                   </label>
@@ -95,7 +94,15 @@
 
         </div> <!-- row.// -->
         <input type="hidden" name="{{form.quantity.name}}" value="{{form.quantity.value}}" />
-        <button class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+        <div id="cartBtnContainer">
+            {% if product.available_sizes.count > 1 %}
+                {% include 'store/partials/_variation_modal_btn.html' %}
+            {% elif order_item.quantity >= 1 %}
+                {% include 'store/partials/_item_quantity.html' %}
+            {% else %}
+                {% include 'store/partials/_add_to_cart_btn.html' %}
+            {% endif %}
+        </div>
       </form>
 
         <hr>
@@ -146,17 +153,4 @@
     </section>
 
 {% endblock body %}
-{% block scripts %}
-      <script>
-        document.addEventListener('DOMContentLoaded', (e) => {
-          radioButton = document.querySelectorAll('.choice')
-          if (radioButton.length > 0){
-            radioButton.forEach((radio) => {
-              radio.removeAttribute('required')
-              console.log(worked)
-            })
-          } 
-        })
-          
-      </script>
-    {% endblock scripts %}
+

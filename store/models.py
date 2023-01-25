@@ -35,9 +35,9 @@ class Product(NamedTimeBasedModel):
     stock = models.PositiveSmallIntegerField(default=0)
     is_available = models.BooleanField(default=True)
     categories = models.ManyToManyField('store.Category', blank=True)
-    available_colors = models.ManyToManyField(
-        'store.ColorVariation', blank=True,
-    )
+    # available_colors = models.ManyToManyField(
+    #     'store.ColorVariation', blank=True,
+    # )
     available_sizes = models.ManyToManyField(
         'store.SizeVariation', blank=True,
     )
@@ -80,31 +80,31 @@ class Order(TimeBasedModel):
         null=True
     )
     ordered = models.BooleanField(default=False)
-    billing_address = auto_prefetch.ForeignKey(
-        'home.Address',
-        related_name='billing_address',
-        blank=True, 
-        null=True,
-        on_delete=models.SET_NULL
-    )
-    shipping_address = auto_prefetch.ForeignKey(
-        'home.Address',
-        related_name='shipping_address',
-        blank=True, 
-        null=True,
-        on_delete=models.SET_NULL
-    )
+    address = auto_prefetch.ForeignKey(
+    'home.Address',
+    blank=True, 
+    null=True,
+    on_delete=models.SET_NULL
+)
+    # billing_address = auto_prefetch.ForeignKey(
+    #     'home.Address',
+    #     related_name='billing_address',
+    #     blank=True, 
+    #     null=True,
+    #     on_delete=models.SET_NULL
+    # )
+    # shipping_address = auto_prefetch.ForeignKey(
+    #     'home.Address',
+    #     blank=True, 
+    #     null=True,
+    #     on_delete=models.SET_NULL
+    # )
     reference_number = models.CharField(
         max_length=100,
         blank=True,
         null=True,
     )
 
-    # def save(self, *args, **kwargs):
-    #     if not self.reference_number:
-    #         self.reference_number = f"ORDER-{generate_ref_no()}"
-
-    #     super().save()
 
     def __str__(self):
         return str(self.reference_number)

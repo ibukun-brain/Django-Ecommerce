@@ -1,6 +1,8 @@
 from django import forms
-from .models import OrderItem, Product
+from store.models import OrderItem, Product
+from home.models import Address, CustomUser
 from buyit.utils.forms import CssForm
+from buyit.utils.choices import AddressChoices
 
 class AddToCartForm(CssForm, forms.ModelForm):
     size = forms.ModelChoiceField(
@@ -8,11 +10,11 @@ class AddToCartForm(CssForm, forms.ModelForm):
         widget=forms.RadioSelect(),
         required=False,        
     )
-    color = forms.ModelChoiceField(
-        queryset=OrderItem.objects.none(),
-        widget=forms.RadioSelect(),
-        required=False,
-    )
+    # color = forms.ModelChoiceField(
+    #     queryset=OrderItem.objects.none(),
+    #     widget=forms.RadioSelect(),
+    #     required=False,
+    # )
 
     class Meta:
         model = OrderItem
@@ -25,6 +27,13 @@ class AddToCartForm(CssForm, forms.ModelForm):
 
         super(AddToCartForm, self).__init__(*args, **kwargs)
 
-        self.fields['color'].queryset = product.available_colors.all()
+        # self.fields['color'].queryset = product.available_colors.all()
         self.fields['size'].queryset = product.available_sizes.all()
 
+
+class AddressForm(CssForm, forms.ModelForm):
+    
+    class Meta:
+        model = Address
+        fields = ['address_line_1','address_line_2','city',
+            'state','zip_code']

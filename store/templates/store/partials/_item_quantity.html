@@ -1,0 +1,14 @@
+<div class="row align-items-center">
+    <div class="col-md-3"> 
+        <div class="input-group input-spinner">
+            <div class="input-group-prepend">
+            <a class="btn btn-light w-0" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" id="button-plus"> <i class="fa fa-minus"></i> </a>
+            </div>
+            <input type="text" class="form-control"  value="{{order_item.quantity}}">
+            <div class="input-group-append">
+            <a class="btn btn-light w-0" hx-get="{% url 'store:increase-quantity' order_item.pk %}" id="button-minus"> <i class="fa fa-plus"></i> </a>
+            </div>
+        </div> <!-- input-group.// -->
+    </div> <!-- col.// -->
+    <span>({{order_item.quantity}} item{{order_item.quantity|pluralize}}) added</span>
+</div>

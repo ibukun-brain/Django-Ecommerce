@@ -29,7 +29,9 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter  = ['created_at', 'is_available']
     date_hierarchy = 'created_at'
     search_fields = ['name']
-    filter_horizontal = ['categories', 'available_sizes', 'available_colors']
+    # filter_horizontal = ['categories', 'available_sizes', 'available_colors']
+    filter_horizontal = ['categories', 'available_sizes']
+
     
 
     def price_currency(self, object):
@@ -43,15 +45,14 @@ class Order(admin.ModelAdmin):
     list_display = [
         'user', 'created_at', 
         'ordered_date', 'ordered', 
-        'billing_address', 'shipping_address']
-    autocomplete_fields = ['user','billing_address','shipping_address']
+        'address']
+    autocomplete_fields = ['user','address']
     search_fields = [
-        'user', 'billing_address__address_line_1',
-        'billing_address__address_line_2','shipping_address__address_line_1',
-        'shipping_address__address_line_2']
+        'user', 'address__address_line_1',
+        'address__address_line_2']
     list_filter = ['ordered', 'ordered_date', 'created_at']
     date_hierarchy = 'created_at'
-    list_select_related = ['user','billing_address', 'shipping_address']
+    list_select_related = ['user','address']
 
 
 @admin.register(OrderItem)

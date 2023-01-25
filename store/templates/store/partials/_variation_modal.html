@@ -1,0 +1,60 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Please select a variation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <form method="post" hx-post="">
+                    <div class="row">
+                        {% for size in product.available_sizes.all %}
+                            <div class="col-md-9 px-2 py-2">
+                                {{size.name}}
+                                <p>₦ {{product.price}}</p>
+                            </div>
+                            <input type="text" name="size" hidden value="{{size.name}}">
+                            <div class="col-md-3 ml-auto">
+                                <div class="input-group input-spinner">
+                                    <div class="input-group-prepend">
+                                    {% if order_item %}
+                                    <button class="btn btn-light w-0" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" id="button-plus"> <i class="fa fa-minus"></i> </button>
+                                    </div>
+                                    <input type="text" class="form-control"  value="{{order_item.quantity}}">
+                                    <div class="input-group-append">
+                                    <a class="btn btn-light w-0" hx-get="{% url 'store:increase-quantity' order_item.pk %}" id="button-minus"> <i class="fa fa-plus"></i> </a>
+                                    </div>
+                                    {% else %}
+                                        <button disabled class="btn btn-light w-0" hx-get="{# {% url 'store:decrease-quantity' order_item.pk %} #}" id="button-plus"> <i class="fa fa-minus"></i> </button>
+                                        </div>
+                                            <input type="text" class="form-control" name="quantity" value="{{order_item.quantity|default:"0"}}">
+                                            <div class="input-group-append">
+                                            <button class="btn btn-light w-0" hx-get="{# {% url 'store:increase-quantity' order_item.pk %} #}" id="button-minus"> <i class="fa fa-plus"></i> </button>
+                                            </div>
+                                    {% endif %}
+                                </div> <!-- input-group.// -->
+                            </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6 text-center g-2">
+                        <a href="{% url 'store:product-list' %}" class="btn btn-outline-primary btn-block btn-md">Continue Shopping</a>
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <button type="button" class="btn btn-primary btn-block btn-md">View Cart and Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>

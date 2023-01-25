@@ -9,4 +9,9 @@ urlpatterns = [
         home_views.IndexView.as_view(),
         name='index'
     ),
+    path(
+        'accounts/dashboard/',
+        home_views.DashboardView.as_view(),
+        name='dashboard'
+    ),
 ]

@@ -35,6 +35,7 @@
         <h4 class="card-title mb-4">Sign in</h4>
       <form method="POST" action="{% url 'account_login' %}">
             {% csrf_token %}
+            {% comment %} {{form}} {% endcomment %}
             {% include 'partials/_form_errors.html' %}
             <div class="form-group">
               <input type="text" class="form-control" name="{{form.login.name}}" placeholder="Username or Email Address" value={{form.login.value|default:''}}>
@@ -44,7 +45,7 @@
                  </div> <!-- form-group// -->
                  
                  <div class="form-group">
-                   <a href="#" class="float-right">Forgot password?</a> 
+                   <a href="{% url 'account_reset_password' %}" class="float-right">Forgot password?</a> 
                   
                  </div> <!-- form-group form-check .// -->
                  <div class="form-group">
@@ -57,33 +58,6 @@
         {% endif %}
       </div>
     </div>
-
-  <!-- ============================ COMPONENT LOGIN   ================================= -->
-    {% comment %} <div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
-        <div class="card-body">
-        <h4 class="card-title mb-4">Sign in</h4>
-        <form>
-            <div class="form-group">
-         <input type="email" class="form-control" placeholder="Email Address">
-            </div> <!-- form-group// -->
-            <div class="form-group">
-        <input type="password" class="form-control" placeholder="Password">
-            </div> <!-- form-group// -->
-            
-            <div class="form-group">
-              <a href="#" class="float-right">Forgot password?</a> 
-             
-            </div> <!-- form-group form-check .// -->
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block"> Login  </button>
-            </div> <!-- form-group// -->    
-        </form>
-        </div> <!-- card-body.// -->
-      </div> <!-- card .// --> {% endcomment %}
-  
-       <p class="text-center mt-4">Don't have account? <a href="#">Sign up</a></p>
-       <br><br>
-  <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
   
   
   </section>

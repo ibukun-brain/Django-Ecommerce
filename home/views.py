@@ -13,3 +13,6 @@ class IndexView(TemplateView):
             .order_by('-created_at')[:8]
         context["products"] = products
         return context
+
+class DashboardView(TemplateView):
+    template_name = 'home/dashboard.html'
