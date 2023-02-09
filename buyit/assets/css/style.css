@@ -6,9 +6,9 @@
 .input-spinner .btn {
     width: 32px !important;
 }
-.btn-light:not(:disabled):not(.disabled):active, 
+/* .btn-light:not(:disabled):not(.disabled):active, 
 .btn-light:not(:disabled):not(.disabled).active, 
 .show > .btn-light.dropdown-toggle{
     background: none;
     
-}
+} */

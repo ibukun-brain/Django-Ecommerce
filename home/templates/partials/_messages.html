@@ -1,12 +1,19 @@
+{% comment %} <style>
+  .section-content{
+    padding: 0 !important;
+  }
+</style> {% endcomment %}
 {% if messages %} 
-<div class="row">
-  <div class="col-md-12 justify-content-center mb-3">
+<div class="" id="message" hx-swap-oob="true">
+  <div class="justify-content-center text-center">
     {% if messages %}
       {% for message in messages %}
         {% if forloop.counter == messages|length %}
         <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close mt-1" data-dismiss="alert" aria-label="Close" style="opacity: 1"></button>
+          <strong>{{ message }}</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         {% endif %}
       {% endfor %}
@@ -14,3 +21,14 @@
   </div>
 </div>
 {% endif %}
+
+<script type="text/javascript">
+  // jquery ready start
+  $(document).ready(function() {
+    // jQuery code
+    $(".alert").delay(10000).slideUp(200, function () {
+      $(this).alert('close');
+      });
+  }); 
+  // jquery end
+  </script>

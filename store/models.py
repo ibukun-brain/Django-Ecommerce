@@ -57,11 +57,13 @@ class Product(NamedTimeBasedModel):
     
 
 class SizeVariation(NamedTimeBasedModel):
+    # stock = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
         return f"{self.name}"
     
 class ColorVariation(NamedTimeBasedModel):
+    # stock = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
         return f"{self.name}"
@@ -138,12 +140,12 @@ class OrderItem(TimeBasedModel):
         default=1,
         blank=True
     )
-    color = auto_prefetch.ForeignKey(
-        'store.ColorVariation',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    # color = auto_prefetch.ForeignKey(
+    #     'store.ColorVariation',
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    # )
     size = auto_prefetch.ForeignKey(
         'store.SizeVariation',
         on_delete=models.SET_NULL,
@@ -159,7 +161,11 @@ class OrderItem(TimeBasedModel):
     
 
     def __str__(self):
-         return f"{self.product} x {self.quantity}"
+        if self.size is not None:
+            size = self.size.name
+            return f"{self.product} x {self.quantity} - {size}"
+        return f"{self.product} x {self.quantity}"
+
     
 
 class Payment(TimeBasedModel):

@@ -57,12 +57,15 @@ class Order(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order', 'quantity', 'color', 'size']
-    list_select_related = ['product', 'order', 'color', 'size']
+    # list_display = ['product', 'order', 'quantity', 'color', 'size']
+    list_display = ['product', 'order', 'quantity', 'size']
+    list_select_related = ['product', 'order', 'size']
+    # list_select_related = ['product', 'order', 'color', 'size']
     autocomplete_fields = ['product', 'order']
     list_filter = ['created_at', 'updated_at']
     search_fields = ['product__name', 'order__name']
-    autocomplete_fields = ['product', 'order', 'color', 'size']
+    # autocomplete_fields = ['product', 'order', 'color', 'size']
+    autocomplete_fields = ['product', 'order', 'size']
     date_hierarchy = 'created_at'
 
 

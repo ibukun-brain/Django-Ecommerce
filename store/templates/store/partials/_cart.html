@@ -1,0 +1,105 @@
+{% load static store_template_tags %}
+    <div class="container">
+    {% if order.orderitem_set.all.count <= 0 %}
+        <h2 class="text-center">Your shopping cart is empty</h2>
+        <br>
+        <div class="text-center">
+            <a href="{% url 'store:product-list' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% else %}
+    
+    <!-- ============================ COMPONENT 1 ================================= -->
+   
+    <div class="row">
+        <aside class="col-lg-9">
+    <div class="card table-responsive" style="height: 4d00px">
+    <table class="table table-borderless table-shopping-cart overflow-auto">
+    <thead class="text-muted">
+    <tr class="small text-uppercase">
+      <th scope="col">Product</th>
+      <th scope="col" width="120">Quantity</th>
+      <th scope="col" width="120">Price</th>
+      <th scope="col" class="text-right" width="200"></th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for order_item in order.orderitem_set.all %}
+    <tr>
+        <td>
+            <figure class="itemside align-items-center">
+                <div class="aside"><img src="{{order_item.product.image_url}}" class="img-sm"></div>
+                <figcaption class="info">
+                    <a href="{{order_item.product.get_absolute_url}}" class="title text-dark">{{order_item.product.name}}</a>
+                    <p class="text-muted small">{% if order_item.size %}Size: {{order_item.size.name}}{% endif %} <br> 
+                        {% comment %} {% if order_item.size %}Color: {{order_item.color.name}}{% endif %} {% endcomment %}
+                    </p>
+                </figcaption>
+            </figure>
+        </td>
+        <td> 
+            <!-- col.// -->
+                        <div class="col"> 
+                            <div class="input-group input-spinner">
+                                <div class="input-group-prepend">
+                                <a class="btn btn-light" hx-target="#cart-section" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" id="button-plus"> <i class="fa fa-minus" ></i> </a>
+                                </div>
+                                <input type="text" class="form-control"  value="{{order_item.quantity}}">
+                                <div class="input-group-append">
+                                <a class="btn btn-light" hx-target="#cart-section" hx-get="{% url 'store:increase-quantity' order_item.pk %}" id="button-minus"> <i class="fa fa-plus"></i> </a>
+                                </div>
+                            </div> <!-- input-group.// -->
+                        </div> <!-- col.// -->
+        </td>
+        <td> 
+            <div class="price-wrap"> 
+                <var class="price">₦{{order_item.get_total}}</var> 
+                <small class="text-muted"> ₦{{order_item.product.price}} each </small> 
+            </div> <!-- price-wrap .// -->
+        </td>
+        <td class="text-right"> 
+        <a hx-target="#cart-section" hx-get="{% url 'store:remove-orderitem' order_item.pk %}" class="btn btn-danger text-white"> <i class="fa fa-trash"></i></a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div> <!-- card.// -->
+    
+        </aside> <!-- col.// -->
+        <aside class="col-lg-3">
+    
+            <div class="card">
+            <div class="card-body">
+                <dl class="dlist-align">
+                  <dt>Total price:</dt>
+                  <dd class="text-right">₦{{order.get_overall_price}}</dd>
+                </dl>
+                {% comment %} <dl class="dlist-align">
+                  <dt>Tax:</dt>
+                  <dd class="text-right"> ₦10.00</dd>
+                </dl>
+                <dl class="dlist-align">
+                  <dt>Total:</dt>
+                  <dd class="text-right text-dark b"><strong>₦59.97</strong></dd>
+                </dl> {% endcomment %}
+                <hr>
+                <p class="text-center mb-3">
+                    <img src="{% static '/images/misc/payments.png' %}" height="26">
+                </p>
+                <a href="{% url 'store:checkout' %}" class="btn btn-primary btn-block"> Checkout </a>
+                <a href="{% url 'store:product-list' %}" class="btn btn-light btn-block">Continue Shopping</a>
+            </div> <!-- card-body.// -->
+            </div> <!-- card.// -->
+    
+    </aside> <!-- col.// -->
+
+    </div> <!-- row.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    
+    {% endif %}
+</div> <!-- container .//  -->
+{% if request.htmx %}
+    <span class="badge badge-pill badge-danger notify" id="cart" hx-swap-oob="true">{{request|order_item_count}}</span>
+    {% include 'partials/_messages.html' %}
+{% endif %}
+    

@@ -10,8 +10,7 @@
     
     <!-- ============================ COMPONENT 2 ================================= -->
     <div class="row">    
-    
-        <article class="card mb-6 col-md-6">
+        <article class="card mb-6 col-md-6 table-responsive">
         <div class="card-body">
             <h4 class="card-title mb-4">Contact info</h4>
             <form method="post">
@@ -28,7 +27,7 @@
                     </div>
                     <div class="form-group col-sm-6">
                         <label>Phone</label>
-                        <input type="text" value="+998" class="form-control" readonly value={{request.user.mobile_no}}>
+                        <input type="text" class="form-control" readonly value={{request.user.mobile_no}}>
                     </div>
                     <div class="form-group col-sm-6">
                         <label>Email</label>
@@ -62,8 +61,8 @@
     
 
            <aside class="col-md-6">
-                <div class="card">
-              <table class="table table-borderless table-shopping-cart">
+                <div class="card table-responsive" style="height: 500px">
+              <table class="table table-borderless table-shopping-cart overflow-auto">
               <thead class="text-muted">
               <tr class="small text-uppercase">
                 <th scope="col" width>Product</th>
@@ -79,7 +78,8 @@
                           <div class="aside"><img src="{{order_item.product.image_url}}" class="img-sm"></div>
                           <figcaption class="info">
                               <a href="{{order_item.product.get_absolute_url}}" class="title text-dark">{{order_item.product.name}}</a>
-                              <p class="text-muted small">{% if order_item.size %}Size: {{order_item.size.name}}{% endif %} <br> {% if order_item.size %}Color: {{order_item.color.name}}{% endif %}</p>
+                              <p class="text-muted small">{% if order_item.size %}Size: {{order_item.size.name}}{% endif %} <br> 
+                                {% comment %} {% if order_item.size %}Color: {{order_item.color.name}}{% endif %}</p> {% endcomment %}
                           </figcaption>
                       </figure>
                   </td>

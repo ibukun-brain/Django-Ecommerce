@@ -1,19 +1,23 @@
+import datetime
+import json
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy 
 from django.views.generic import (
     DetailView, FormView, 
     ListView, TemplateView,
     View,
 )
+from django.http import JsonResponse, HttpResponse
 from home.models import Address
 from store.helpers import get_or_set_order_session
 from store.forms import AddToCartForm, AddressForm
 from store.models import (
     Order, OrderItem, Category, 
-    Product
+    Product, SizeVariation, Payment
 )
 from buyit.utils.choices import AddressChoices
 
@@ -80,8 +84,8 @@ class ProductDetailView(FormView):
             )
             if order_item.exists():
                 order_item = order_item.first()
-                order.quantity = int(form.cleaned_data['quantity'])
-                # order_item.quantity += int(form.cleaned_data['quantity'])
+                # order.quantity += int(form.cleaned_data['quantity'])
+                order_item.quantity += 1
                 order_item.save()
 
             else:
@@ -94,27 +98,69 @@ class ProductDetailView(FormView):
             context = {
                 'order_item':order_item
             }
+            messages.success(self.request, 'Product successfully added to cart!')
             return render(self.request, 'store/partials/_item_quantity.html', context)
     
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
-        order = Order.objects.get(user=self.request.user)
+        order = get_or_set_order_session(self.request)
         order_item = None
         try:
             order_item = OrderItem.objects.get(
             order=order,
-            product=self.get_object(),    
+            product=self.get_object(),
+            size=None,    
         )
         except OrderItem.DoesNotExist:
             pass
         context.update({
             'order_item':order_item,
-            'product':self.get_object(
-            
-            )
+            'product':self.get_object()
         })
-        context["product"] = self.get_object()
+
         return context
+    
+    def get(self, request, *args, **kwargs):
+        """
+            we can still use the modal box
+            first we filter by the current product, loop through then display the values
+        """
+        if self.request.htmx:
+            order = get_or_set_order_session(self.request)
+            order_item_id = self.request.GET.get('order_item_id')
+            print(order_item_id)
+            size_id = self.request.GET.get('size_id')
+            print(size_id)
+            order_item = None
+            try:
+                order_item = OrderItem.objects.get(
+                order=order,
+                size=int(size_id), 
+                product=self.get_object(),
+            )
+            except OrderItem.DoesNotExist:
+                pass
+            context = {
+                'order_item':order_item,
+            }    
+
+            return render(self.request, 'store/partials/_variation_btn.html', context)
+        order = get_or_set_order_session(self.request)
+        order_item = None
+        try:
+            order_item = OrderItem.objects.get(
+            order=order,
+            product=self.get_object(),
+            size=None,    
+        )
+        except OrderItem.DoesNotExist:
+            pass
+       
+        context = {
+            'order_item':order_item,
+            'product':self.get_object(),
+        }
+        return render(self.request, 'store/product_detail.html', context)
     
 
 class CartView(TemplateView):
@@ -131,33 +177,61 @@ class IncreaseQuantityView(View):
 
     def get(self, request, *args, **kwargs):
         order_item = get_object_or_404(OrderItem, pk=kwargs['pk'])
-        order_item.quantity += 1
-        order_item.save()
-        context = {'order_item': order_item}
-        return render(request, 'store/partials/_item_quantity.html', context=context)
+        context = {
+            'order':get_or_set_order_session(request)
+        }
+        if request.htmx:
+
+            order_item.quantity += 1
+            order_item.save()
+            messages.success(self.request, 'Item quantity successfully updated!')
+            context.update({'order_item': order_item})
+            if 'product' in request.htmx.current_url:
+                return render(request, 'store/partials/_item_quantity.html', context=context)
+            messages.success(self.request, 'Item quantity successfully updated!')
+            return render(request, 'store/partials/_cart.html', context)
+
     
 
 class DecreaseQuantityView(View):
 
     def get(self, request, *args, **kwargs):
         order_item = get_object_or_404(OrderItem, pk=kwargs['pk'])
-        if order_item.quantity <= 1:
-            order_item.delete()
-            return render(request, 'store/partials/_add_to_cart_btn.html')
+        context = {
+            'order':get_or_set_order_session(request)
+        }
+        if request.htmx:
+            if order_item.quantity <= 1:
+                order_item.delete()
+                messages.warning(request, 'Item successfully removed from cart!')
+                context.update({'order_item': order_item})
+                if 'product' in request.htmx.current_url:
+                    return render(request, 'store/partials/_add_to_cart_btn.html')
+                messages.warning(request, 'Item successfully removed from cart!')
+                return render(request, 'store/partials/_cart.html', context)
 
-        else:
-            order_item.quantity -= 1
-            order_item.save()
-        context = {'order_item': order_item}
-        return render(request, 'store/partials/_item_quantity.html', context=context)
-    
+            else:
+                order_item.quantity -= 1
+                order_item.save()
+                context.update({'order_item': order_item})
+                if 'product' in request.htmx.current_url:
+                    return render(request, 'store/partials/_item_quantity.html', context=context)
+                
+                messages.warning(self.request, 'Item quantity successfully updated!')
+                return render(request, 'store/partials/_cart.html', context)
 
+            
 class RemoveOrderItemView(View):
     def get(self, request, *args, **kwargs):
         if request.htmx:
             order_item = get_object_or_404(OrderItem, pk=kwargs['pk'])
             order_item.delete()
-            return redirect('store:carts')
+            order = get_or_set_order_session(self.request)
+            context = {
+                'order': order,
+            }
+            messages.success(request, 'Item successfully removed from cart!')
+            return render(request, 'store/partials/_cart.html', context)
 
 
 class CheckOutView(LoginRequiredMixin, FormView):
@@ -192,29 +266,13 @@ class CheckOutView(LoginRequiredMixin, FormView):
         address.city=form.cleaned_data['city']
         address.state=form.cleaned_data['state']
         address.save()
-        # address = form.save(commit=False)
-        # address.user = self.request.user
-        # address.save()
-        # if self.request.user == address.user:
-        #     address.address_line_1=form.cleaned_data['address_line_1'],
-        #     address.address_line_2=form.cleaned_data['address_line_2'],
-        #     address.zip_code = form.cleaned_data['zip_code'],
-        #     address.city=form.cleaned_data['city'],
-        #     address.state=form.cleaned_data['state'],
-        # address = Address.objects.create(
-        #     user=self.request.user,
-        #     address_line_1=form.cleaned_data['address_line_1'],
-        #     address_line_2=form.cleaned_data['address_line_2'],
-        #     zip_code = form.cleaned_data['zip_code'],
-        #     city=form.cleaned_data['city'],
-        #     state=form.cleaned_data['state'],
-        # )
         order.address = address
         
         order.save()
 
         messages.info(self.request, 'You have sucessfully added your addresses')
-        return redirect(reverse_lazy('home:dashboard'))
+        return redirect(reverse_lazy('store:payment'))
+        # return redirect(reverse_lazy('home:dashboard'))
 
 
     def get_context_data(self, **kwargs):
@@ -222,3 +280,78 @@ class CheckOutView(LoginRequiredMixin, FormView):
         context['order'] = get_or_set_order_session(self.request)
         return context
     
+
+class AddToCartVariationBtnView(View):
+    
+    def get(self, request, *args, **kwargs):
+        if request.htmx:
+            order_item_id = request.GET.get('order_item_id')
+            size_id = request.GET.get('size_id')
+
+            return render(request, 'store/partials/_variation_btn.html')
+
+
+class PaymentView(TemplateView):
+    template_name = 'store/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = {
+            "order":get_or_set_order_session(self.request),
+            "PAYPAL_CLIENT_ID":settings.PAYPAL_CLIENT_ID,
+            "CALLBACK_URL":self.request.build_absolute_uri(reverse('home:dashboard'))
+            }
+        return context
+    
+
+class ConfirmOrderView(View):
+
+    def post(self, request, *args, **kwargs):
+        order = get_or_set_order_session(request)
+        body = json.loads(request.body)
+        # print(body)
+        Payment.objects.create(
+            order=order,
+            successful=True,
+            raw_response =json.dumps(body),
+            amount=float(body['purchase_units'][0]['amount']['value']),
+            payment_method="PayPal",
+        )
+        order.ordered = True
+        order.ordered_date = datetime.date.today()
+        order.save()
+
+        return JsonResponse({'data':'success'})
+# class VariationFormView(View):
+
+#     def post(self, request, *args, **kwargs):
+#         print(request.POST)
+#         if request.htmx:
+#             product = Product.objects.get(pk=request.POST.get('product_pk'))
+#             size = SizeVariation.objects.get(name=request.POST.get('size'))
+#             order = get_or_set_order_session(self.request)
+#             order_item, created = OrderItem.objects.get_or_create(
+#                 product=product,
+#                 order=order,
+#                 size=size,
+#                 quantity=int(request.POST.get('quantity'))
+#             )
+#             if not created:
+#                 order_item.quantity += int(request.POST.get('quantity'))
+#             # if order_item.exists():
+#             #     order_item = order_item.first()
+#             #     order.quantity = int(form.cleaned_data['quantity'])
+#             #     # order_item.quantity += int(form.cleaned_data['quantity'])
+#             #     order_item.save()
+
+#             # else:
+#             #     order_item = form.save(commit=False)
+#             #     order_item.product = product
+#             #     order_item.order = order
+#             #     order_item.save()
+
+#                 # return super(ProductDetailView, self).form_valid(form)
+#             context = {
+#                 'order_item':order_item
+#             }
+#             return render(self.request, 'store/partials/_variation_modal.html', context)

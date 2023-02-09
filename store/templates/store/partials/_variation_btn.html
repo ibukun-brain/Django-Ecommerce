@@ -1,0 +1,11 @@
+{% load store_template_tags %}
+{% if order_item.quantity >= 1 %}
+{% include 'store/partials/_item_quantity.html' %}
+{% else %}
+<button type="submit" class="btn btn-primary" id="addToCartVariationBtn" data-toggle="modal" data-target="#exampleModalCenter">
+    <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>
+</button>
+{% endif %}
+{% if request.htmx %}
+<span class="badge badge-pill badge-danger notify" id="cart" hx-swap-oob="true">{{request|order_item_count}}</span>
+{% endif %}

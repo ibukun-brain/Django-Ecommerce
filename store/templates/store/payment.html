@@ -1,0 +1,212 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+{% block title %}Checkout{% endblock title %}
+
+{% block body %}
+<section class="section-content padding-y bg">
+    <div class="container">
+    
+    <!-- ============================ COMPONENT 2 ================================= -->
+    <div class="row"> 
+        {% comment %} <div class="text-center">Review your order</div>    {% endcomment %}
+        <main class="col-md-6">
+            <article class="card mb-3">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Contact info</h4>
+                        <div class="">
+                            <span>Name: {{request.user.get_full_name}}</span><br>
+                            <span>Phone: {{request.user.mobile_no}}</span><br>
+                            <span>Email: {{request.user.email}}</span><br>
+                            <span>Address 1: {{order.address.address_line_1}}</span><br>
+                            {% if order.user.address.address_line_2 %}<span>Address 2: {{order.user.address.address_line_2}}</span>{% endif %}
+                            <span>City: {{order.address.city}}</span><br>
+                            <span>State: {{order.address.state}}</span><br>
+                            <span>Zip code: {{order.address.zip_code}}</span><br>
+                        </div>
+                    
+                </div> <!-- card-body.// -->
+            </article> <!-- card.// -->
+            
+            <article class="accordion" id="accordion_pay">
+                <div class="card">
+                    <header class="card-header">
+                        <img src="{% static 'images/misc/payment-paypal.png' %}" class="float-right" height="24"> 
+                        <label class="form-check collapsed" data-toggle="collapse" data-target="#pay_paynet">
+                            <input class="form-check-input" name="payment-option" checked="" type="radio" value="option2">
+                            <h6 class="form-check-label"> 
+                                Paypal 
+                            </h6>
+                        </label>
+                    </header>
+                    <div id="pay_paynet" class="collapse show" data-parent="#accordion_pay">
+                    <div class="card-body">
+                        <p class="text-center text-muted">Connect your PayPal account and use it to pay your bills. You'll be redirected to PayPal to add your billing information.</p>
+                        <p class="text-center">
+                            <a href="#"><img src="{% static 'images/misc/btn-paypal.png' %}" height="32"></a>
+                            <br><br>
+                        </p>
+                    </div> <!-- card body .// -->
+                    </div> <!-- collapse .// -->
+                </div> <!-- card.// -->
+                <div class="card">
+                <header class="card-header">
+                    <img src="{% static 'images/misc/payment-card.png' %}" class="float-right" height="24">  
+                    <label class="form-check" data-toggle="collapse" data-target="#pay_payme">
+                        <input class="form-check-input" name="payment-option" type="radio" value="option2">
+                        <h6 class="form-check-label"> Credit Card  </h6>
+                    </label>
+                </header>
+                <div id="pay_payme" class="collapse" data-parent="#accordion_pay">
+                    <div class="card-body">
+                        <p class="alert alert-success">Some information or instruction</p>
+                        <form class="form-inline">
+                            <input type="text" class="form-control mr-2" placeholder="xxxx-xxxx-xxxx-xxxx" name="">
+                            <input type="text" class="form-control mr-2" style="width: 100px" placeholder="dd/yy" name="">
+                            <input type="number" maxlength="3" class="form-control mr-2" style="width: 100px" placeholder="cvc" name="">
+                            <button class="btn btn btn-success">Button</button>
+                        </form>
+                    </div> <!-- card body .// -->
+                </div> <!-- collapse .// -->
+                </div> <!-- card.// -->
+                
+            </article>
+        </main>
+    
+
+           <aside class="col-md-6">
+                <div class="card table-responsive" style="max-height: 500px">
+                <table class="table table-borderless table-shopping-cart overflow-auto">
+                <thead class="text-muted">
+                <tr class="small text-uppercase">
+                    <th scope="col" width>Product</th>
+                    <th scope="col" class="text-center">Quantity</th>
+                    <th scope="col" width="">Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in order.orderitem_set.all %}
+                <tr>
+                    <td class="mx-0">
+                        <figure class="itemside align-items-center">
+                            <div class="aside"><img src="{{order_item.product.image_url}}" class="img-sm"></div>
+                            <figcaption class="info">
+                                <a href="{{order_item.product.get_absolute_url}}" class="title text-dark">{{order_item.product.name}}</a>
+                                <p class="text-muted small">{% if order_item.size %}Size: {{order_item.size.name}}{% endif %} <br> 
+                                    {% comment %} {% if order_item.size %}Color: {{order_item.color.name}}{% endif %}</p> {% endcomment %}
+                            </figcaption>
+                        </figure>
+                    </td>
+                    <td class="text-center"> 
+                        {{order_item.quantity}}
+                    </td>
+                    <td> 
+                        <div class="price-wrap"> 
+                            <var class="price">₦{{order_item.get_total}}</var> 
+                            <small class="text-muted"> ₦{{order_item.product.price}} each </small> 
+                        </div> <!-- price-wrap .// -->
+                    </td>
+    
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2" class="text-center"><strong>Total</strong></td>
+                    <td><strong>₦{{order.get_overall_price}}</strong></td>
+                </tr>
+                
+                </tbody>
+                
+                </table>
+                {% comment %} <div id="alternate-button-container">
+                <button>Pay with a different method</button>
+                </div> {% endcomment %}
+                {% comment %} <div class="px-4 py-4">
+                    <button type="submit" class="btn btn-primary btn-block"> Place Order </button>
+                    <a href="{% url 'store:product-list' %}" class="btn btn-outline-dark btn-block"> Continue Shopping </a>
+
+                </div> {% endcomment %}
+                </form>
+
+              
+                    
+                {% comment %} </div> <!-- card-body.// --> {% endcomment %}
+                </div> <!-- card.// -->
+                <div class="container">
+                    <div class="row mt-3 justify-content-center">
+                        <div class="col-md-8">
+                            <div id="paypal-button-container" class="mx-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </aside> <!-- col.// -->
+    </div> <!-- row.// -->
+    
+    <!-- ============================ COMPONENT 2 END//  ================================= -->
+    
+    
+    
+    
+    </div> <!-- container .//  -->
+</section>
+{% endblock body %}
+
+{% block scripts %}
+<script src="https://www.paypal.com/sdk/js?client-id={{PAYPAL_CLIENT_ID}}&currency=USD"></script>
+
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function sendOrderConfirmed(orderData){
+        return fetch("{% url 'store:confirm-order' %}", {
+            method: 'POST',
+            body: JSON.stringify(orderData),
+            headers:{
+                'X-CSRFToken':csrftoken,
+            }
+        })
+    }
+    paypal.Buttons({
+      // Sets up the transaction when a payment button is clicked
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '{{order.get_overall_price}}' // Can also reference a variable or function
+            }
+          }]
+        });
+      },
+      // Finalize the transaction after payer approval
+      onApprove: (data, actions) => {
+        return actions.order.capture().then(function(orderData) {
+          // Successful capture! For dev/demo purposes:
+          console.log(orderData)
+          sendOrderConfirmed(orderData).then(res => {
+            alert('Payment was successful')
+            setTimeout(() =>{
+                window.location.replace("{{CALLBACK_URL}}");
+            }, 3000)
+          }).catch(err => {
+            alert('Payment was not successful')
+          })
+          
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
+{% endblock scripts %}

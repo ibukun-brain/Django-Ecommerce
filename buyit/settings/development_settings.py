@@ -40,3 +40,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DATABASES["default"] = dj_database_url.parse(
     f"sqlite:////{BASE_DIR.joinpath(BASE_DIR.name)}.db", conn_max_age=600,
 )
+
+PAYPAL_CLIENT_ID = 'Ad3uDKXmiTHvvcVUM6C-zHANQU-tbNV51E9-3cLAHP509H-Id3gwEAUzpQlZPFzu5Pw2S-5GsgTPSFtj'
+PAYPAL_SECRET_KEY = 'ENpRwCZ19E7zOHR_S7vzFFruds4i0GEXHConGyO1qMJtC1L0wUHjBA-O21nC7RbXp2gOLzmeh82zyH6v'

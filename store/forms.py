@@ -18,7 +18,8 @@ class AddToCartForm(CssForm, forms.ModelForm):
 
     class Meta:
         model = OrderItem
-        fields = ['quantity', 'size', 'color']
+        fields = ['quantity', 'size']
+        # fields = ['quantity', 'size', 'color']
 
 
     def __init__(self, *args, **kwargs):

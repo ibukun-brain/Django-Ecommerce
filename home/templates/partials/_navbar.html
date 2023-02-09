@@ -67,8 +67,7 @@
         </div> <!-- col.// -->
         <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
                     <div class="d-flex justify-content-end mb-3 mb-lg-0">
-                        
-
+        
                         <div class="widget-header">
                             {% if request.user.is_authenticated %}
                                 <small class="title text-muted">Welcome {{request.user}}!</small>
@@ -87,7 +86,7 @@
                         </div>
                         <a href="{% url 'store:carts' %}" class="widget-header pl-3 ml-3">
                             <div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>
-                            <span class="badge badge-pill badge-danger notify">{{request|order_item_count}}</span>
+                            <span class="badge badge-pill badge-danger notify" id="cart">{{request|order_item_count}}</span>
                         </a>
                     </div> <!-- widgets-wrap.// -->
                 </div> <!-- col.// -->

@@ -1,1 +1,7 @@
-<button type="submit" class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+{% load store_template_tags %}
+{% csrf_token %}
+<button type="submit" class="btn btn-primary" id="addToCartBtn"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+{% if request.htmx %}
+<span class="badge badge-pill badge-danger notify" id="cart" hx-swap-oob="true">{{request|order_item_count}}</span>
+{% include 'partials/_messages.html' %}
+{% endif %}

@@ -40,5 +40,25 @@ urlpatterns = [
     view=store_views.CheckOutView.as_view(),
     name='checkout'
     ),
+    path(
+    route='add_to_cart_btn/',
+    view=store_views.AddToCartVariationBtnView.as_view(),
+    name='add-to-cart-variation-btn'
+    ),
+    path(
+    route='make-payment/',
+    view=store_views.PaymentView.as_view(),
+    name='payment',
+    ),  
+    path(
+    route='confirm-order/',
+    view=store_views.ConfirmOrderView.as_view(),
+    name='confirm-order',
+    ),  
+    # path(
+    # route='variation_form/',
+    # view=store_views.VariationFormView.as_view(),
+    # name='variation-form'
+    # ),
     
 ]

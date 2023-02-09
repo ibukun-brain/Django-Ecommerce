@@ -1,14 +1,22 @@
-<div class="row align-items-center">
-    <div class="col-md-3"> 
+{% load store_template_tags %}
+<div id="cartBtnContainer">
+<div class="row align-items-center" hx-swap="innerHTML">
+    <div class=""> 
         <div class="input-group input-spinner">
             <div class="input-group-prepend">
-            <a class="btn btn-light w-0" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" id="button-plus"> <i class="fa fa-minus"></i> </a>
+            <a class="btn btn-light w-0" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" hx-target="#cartBtnContainer"> <i class="fa fa-minus"></i> </a>
             </div>
-            <input type="text" class="form-control"  value="{{order_item.quantity}}">
+            <input type="text" class="form-control" value="{{order_item.quantity}}" readonly>
             <div class="input-group-append">
-            <a class="btn btn-light w-0" hx-get="{% url 'store:increase-quantity' order_item.pk %}" id="button-minus"> <i class="fa fa-plus"></i> </a>
+            <a class="btn btn-light w-0" hx-get="{% url 'store:increase-quantity' order_item.pk %}" hx-target="#cartBtnContainer"> <i class="fa fa-plus"></i> </a>
             </div>
         </div> <!-- input-group.// -->
     </div> <!-- col.// -->
     <span>({{order_item.quantity}} item{{order_item.quantity|pluralize}}) added</span>
 </div>
+</div>
+
+{% if request.htmx %}
+<span class="badge badge-pill badge-danger notify" id="cart" hx-swap-oob="true">{{request|order_item_count}}</span>
+{% include 'partials/_messages.html' %}
+{% endif %}

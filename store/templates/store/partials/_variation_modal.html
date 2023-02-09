@@ -10,37 +10,41 @@
         </div>
         <div class="modal-body">
             <div class="container-fluid">
-                <form method="post" hx-post="">
                     <div class="row">
                         {% for size in product.available_sizes.all %}
                             <div class="col-md-9 px-2 py-2">
                                 {{size.name}}
                                 <p>₦ {{product.price}}</p>
                             </div>
-                            <input type="text" name="size" hidden value="{{size.name}}">
+                            {% comment %} <input type="text" name="size" hidden value="{{size.name}}"> {% endcomment %}
                             <div class="col-md-3 ml-auto">
                                 <div class="input-group input-spinner">
                                     <div class="input-group-prepend">
-                                    {% if order_item %}
+                                    {% comment %} {% if order_item %}
                                     <button class="btn btn-light w-0" hx-get="{% url 'store:decrease-quantity' order_item.pk %}" id="button-plus"> <i class="fa fa-minus"></i> </button>
                                     </div>
-                                    <input type="text" class="form-control"  value="{{order_item.quantity}}">
+                                    <input type="text" class="form-control"  value="{{order_item.quantity|default:"1"}}">
                                     <div class="input-group-append">
                                     <a class="btn btn-light w-0" hx-get="{% url 'store:increase-quantity' order_item.pk %}" id="button-minus"> <i class="fa fa-plus"></i> </a>
                                     </div>
-                                    {% else %}
-                                        <button disabled class="btn btn-light w-0" hx-get="{# {% url 'store:decrease-quantity' order_item.pk %} #}" id="button-plus"> <i class="fa fa-minus"></i> </button>
+                                    {% else %} {% endcomment %}
+                                    <form method="post" hx-post="{% url 'store:variation-form' %}">
+                                        {% csrf_token %}                    
+                                        <button disabled class="btn btn-light w-0" id="button-minus"> <i class="fa fa-minus"></i> </button>
                                         </div>
-                                            <input type="text" class="form-control" name="quantity" value="{{order_item.quantity|default:"0"}}">
+                                            <input type="text" class="form-control" name="quantity" value="{{order_item.quantity|default:"1"}}">
+                                            <input type="hidden" class="form-control" name="size" value="{{size.name}}">
+                                            <input type="hidden" class="form-control" name="product_pk" value="{{product.pk}}">
+
                                             <div class="input-group-append">
-                                            <button class="btn btn-light w-0" hx-get="{# {% url 'store:increase-quantity' order_item.pk %} #}" id="button-minus"> <i class="fa fa-plus"></i> </button>
+                                            <button type="submit" class="btn btn-light w-0" id="button-plus"> <i class="fa fa-plus"></i> </button>
                                             </div>
-                                    {% endif %}
+                                    </form>
+                                    {% comment %} {% endif %} {% endcomment %}
                                 </div> <!-- input-group.// -->
                             </div>
                         {% endfor %}
                     </div>
-                </form>
             </div>
         </div>
         <div class="modal-footer">
