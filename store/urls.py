@@ -55,6 +55,11 @@ urlpatterns = [
     view=store_views.ConfirmOrderView.as_view(),
     name='confirm-order',
     ),  
+    path(
+    route='payment-completed/',
+    view=store_views.PaymentCompleteView.as_view(),
+    name='payment-complete',
+    ),
     # path(
     # route='variation_form/',
     # view=store_views.VariationFormView.as_view(),

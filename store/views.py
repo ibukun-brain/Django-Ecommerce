@@ -12,6 +12,7 @@ from django.views.generic import (
     View,
 )
 from django.http import JsonResponse, HttpResponse
+from django.utils import timezone
 from home.models import Address
 from store.helpers import get_or_set_order_session
 from store.forms import AddToCartForm, AddressForm
@@ -281,7 +282,7 @@ class CheckOutView(LoginRequiredMixin, FormView):
         return context
     
 
-class AddToCartVariationBtnView(View):
+class AddToCartVariationBtnView(LoginRequiredMixin, View):
     
     def get(self, request, *args, **kwargs):
         if request.htmx:
@@ -291,7 +292,7 @@ class AddToCartVariationBtnView(View):
             return render(request, 'store/partials/_variation_btn.html')
 
 
-class PaymentView(TemplateView):
+class PaymentView(LoginRequiredMixin, TemplateView):
     template_name = 'store/payment.html'
 
     def get_context_data(self, **kwargs):
@@ -299,16 +300,18 @@ class PaymentView(TemplateView):
         context = {
             "order":get_or_set_order_session(self.request),
             "PAYPAL_CLIENT_ID":settings.PAYPAL_CLIENT_ID,
-            "CALLBACK_URL":self.request.build_absolute_uri(reverse('home:dashboard'))
+            "CALLBACK_URL":self.request.build_absolute_uri(reverse('store:payment-complete'))
             }
         return context
     
 
-class ConfirmOrderView(View):
+class ConfirmOrderView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        order = get_or_set_order_session(request)
+        order = Order.objects.filter(user=request.user, ordered=False).first()
         body = json.loads(request.body)
+        order.ordered = True
+        order.ordered_date = timezone.now()
         # print(body)
         Payment.objects.create(
             order=order,
@@ -317,11 +320,29 @@ class ConfirmOrderView(View):
             amount=float(body['purchase_units'][0]['amount']['value']),
             payment_method="PayPal",
         )
-        order.ordered = True
-        order.ordered_date = datetime.date.today()
+
         order.save()
 
         return JsonResponse({'data':'success'})
+    
+class PaymentCompleteView(LoginRequiredMixin,TemplateView):
+    template_name = 'store/payment_complete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = Order.objects.filter(
+            user=self.request.user,
+            ordered=True
+        )[0]
+        payment = Payment.objects.filter(
+            order=order,
+            successful=True
+        )[0]
+        context = {
+            'payment': payment,
+        } 
+        return context
+
 # class VariationFormView(View):
 
 #     def post(self, request, *args, **kwargs):

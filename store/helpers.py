@@ -18,6 +18,7 @@ def get_or_set_order_session(request):
                 request.session['order_id'] = order.id    
 
     else:
+        # order = Order.objects.get(user=request.user, ordered=False)
         order, _ = Order.objects.get_or_create(user=request.user, ordered=False)
        
     return order

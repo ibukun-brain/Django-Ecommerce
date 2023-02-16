@@ -2,8 +2,10 @@ import uuid
 from allauth.account.signals import user_logged_in
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from django.utils.text import slugify
-from store.models import Category, Product, Order, OrderItem
+from store.models import Category, Order, OrderItem, Payment, Product
 from home.models import CustomUser
 from store.helpers import get_or_set_order_session
 
@@ -78,4 +80,18 @@ def check_logged_in_user(sender, request, **kwargs):
                 order_item.quantity += 1
                 order_item.save()
 
-    print('hello')
+
+@receiver(post_save, sender=Payment)
+def send_mail_after_payment(sender, instance, created, **kwargs):
+    if created:
+        mail_subject='Your order has been received'
+        html_template = 'store/email/order_email.html'
+        from_email='info@buyit.com'
+        recipient_list=[instance.order.user.email]
+        context = {
+            'payment': instance
+        }
+        html_message = render_to_string(html_template, context=context)
+        mail = EmailMessage(mail_subject, html_message, from_email, to=recipient_list)
+        mail.content_subtype = 'html'
+        mail.send()

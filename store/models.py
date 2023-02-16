@@ -107,6 +107,9 @@ class Order(TimeBasedModel):
         null=True,
     )
 
+    class Meta:
+        ordering = ['-created_at']
+
 
     def __str__(self):
         return str(self.reference_number)
@@ -166,13 +169,13 @@ class OrderItem(TimeBasedModel):
             return f"{self.product} x {self.quantity} - {size}"
         return f"{self.product} x {self.quantity}"
 
-    
 
 class Payment(TimeBasedModel):
     order = auto_prefetch.ForeignKey(
         'store.Order',
-        on_delete=models.CASCADE,
-        related_name='payments'
+        on_delete=models.SET_NULL,
+        related_name='payments',
+        null=True
     )
     payment_method = models.CharField(
         max_length=20,
@@ -186,3 +189,6 @@ class Payment(TimeBasedModel):
     def __str__(self):
         return f"{self.order} - {self.payment_method} - {self.amount}"
     
+
+    class Meta:
+        ordering = ['-created_at']

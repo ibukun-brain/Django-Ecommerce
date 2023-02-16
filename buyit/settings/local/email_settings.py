@@ -1,8 +1,8 @@
-from aritek.utils.settings import get_env_variable
+from buyit.utils import get_env_variable
 
 # Sending email configuration
 EMAIL_HOST_USER = get_env_variable(
-    "ADMIN_EMAIL_ADDRESS", "info@aritekconsulting.com"
+    "ADMIN_EMAIL_ADDRESS", "info@buyit.com"
 )
 
 EMAIL_HOST_PASSWORD = get_env_variable("ADMIN_EMAIL_PASSWORD", "")

@@ -145,3 +145,4 @@ AUTH_USER_MODEL = 'home.CustomUser'
 
 LOGIN_REDIRECT_URL = reverse_lazy('home:index')
 
+TIME_ZONE = 'Africa/Lagos'
