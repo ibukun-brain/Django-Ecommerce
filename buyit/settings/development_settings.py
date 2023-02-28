@@ -25,15 +25,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-STATIC_URL = 'assets/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'assets'
-]
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-STATIC_ROOT = BASE_DIR / 'static_root'
-
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DATABASES["default"] = dj_database_url.parse(

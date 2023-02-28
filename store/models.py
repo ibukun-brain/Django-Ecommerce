@@ -1,15 +1,18 @@
+import math
 import uuid
 import auto_prefetch
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Avg, Count
 from django.urls import reverse
-from django.template.defaultfilters import pluralize
 from buyit.utils.models import NamedTimeBasedModel, TimeBasedModel
-from buyit.utils.media import store_image_upload_path
+from buyit.utils.media import (store_image_upload_path, 
+    store_product_gallery_upload_path
+)
 from buyit.utils.choices import PaymentChoices
-from buyit.utils.strings import generate_ref_no
+from buyit.utils.html import rating_to_html
 
+from review.models import Review
 
 # Create your models here.
 class Category(NamedTimeBasedModel):
@@ -48,13 +51,96 @@ class Product(NamedTimeBasedModel):
     def __str__(self):
         return f"{self.name} - ₦{self.price}"
 
-
+    @property
     def image_url(self):
         if self.image:
             return self.image.url
         
         return f"{settings.STATIC_URL}/images/banners/1.jpg"
     
+    @property
+    def average_review_rating(self):
+        reviews = Review.objects.filter(
+            product=self,
+            reviewed=True,
+        ).aggregate(average=Avg('stars'))
+
+        return round(float(reviews['average']), 2)
+    
+    @property
+    def five_star_count(self):
+        reviews_count = Review.objects.filter(
+            product=self,
+            reviewed=True,
+            stars=5
+        ).count()
+        
+        return reviews_count
+    
+    @property
+    def four_star_count(self):
+        reviews_count = Review.objects.filter(
+            product=self,
+            reviewed=True,
+            stars=4
+        ).count()
+        
+        return reviews_count
+    
+    @property
+    def three_star_count(self):
+        reviews_count = Review.objects.filter(
+            product=self,
+            reviewed=True,
+            stars=3
+        ).count()
+        
+        return reviews_count
+    
+    @property
+    def two_star_count(self):
+        reviews_count = Review.objects.filter(
+            product=self,
+            reviewed=True,
+            stars=2
+        ).count()
+        
+        return reviews_count
+    
+    @property
+    def one_star_count(self):
+        reviews_count = Review.objects.filter(
+            product=self,
+            reviewed=True,
+            stars=1
+        ).count()
+        
+        return reviews_count
+    
+    @property
+    def average_review_rating_star(self):
+        return rating_to_html(self.average_review_rating, show_rating=False)
+
+class ProductGallery(TimeBasedModel):
+    product = auto_prefetch.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+    )
+    image = models.ImageField(upload_to=store_product_gallery_upload_path, blank=True)
+
+    @property
+    def image_url(self):
+        if self.image:
+            return self.image.url
+        
+        return f"{settings.STATIC_URL}/images/banners/1.jpg"
+    
+    def __str__(self):
+        return f"{self.product.name}'s Gallery"
+    
+
+    class Meta:
+        verbose_name_plural = 'Product Galleries'
 
 class SizeVariation(NamedTimeBasedModel):
     # stock = models.PositiveSmallIntegerField(default=1)
@@ -87,7 +173,7 @@ class Order(TimeBasedModel):
     blank=True, 
     null=True,
     on_delete=models.SET_NULL
-)
+    )   
     # billing_address = auto_prefetch.ForeignKey(
     #     'home.Address',
     #     related_name='billing_address',
@@ -113,11 +199,7 @@ class Order(TimeBasedModel):
 
     def __str__(self):
         return str(self.reference_number)
-    
-    # @property
-    # # use signals to handle this better or properly
-    # def reference_number(self):
-    #     return f"ORDER-{generate_ref_no()}"
+
     
     @property
     def get_overall_price(self):
@@ -156,7 +238,6 @@ class OrderItem(TimeBasedModel):
         blank=True,
     )
     
-
     @property
     def get_total(self):
         total = self.product.price * self.quantity

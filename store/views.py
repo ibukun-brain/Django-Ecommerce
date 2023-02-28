@@ -1,4 +1,3 @@
-import datetime
 import json
 from django.conf import settings
 from django.contrib import messages
@@ -7,20 +6,21 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy 
 from django.views.generic import (
-    DetailView, FormView, 
-    ListView, TemplateView,
-    View,
+    FormView, ListView, 
+    TemplateView, View,
 )
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from home.models import Address
+from review.models import Review
 from store.helpers import get_or_set_order_session
 from store.forms import AddToCartForm, AddressForm
 from store.models import (
-    Order, OrderItem, Category, 
-    Product, SizeVariation, Payment
+    Order, OrderItem,
+    Product, Payment,ProductGallery
 )
 from buyit.utils.choices import AddressChoices
+from buyit.utils.mixins import CheckOrderTotalPrice
 
 # Create your views here.
 class ProductListView(ListView):
@@ -80,12 +80,10 @@ class ProductDetailView(FormView):
             order = get_or_set_order_session(self.request)
             order_item = order.orderitem_set.filter(
                 product=product,
-                # color=form.cleaned_data['color'],
                 size=form.cleaned_data['size']
             )
             if order_item.exists():
                 order_item = order_item.first()
-                # order.quantity += int(form.cleaned_data['quantity'])
                 order_item.quantity += 1
                 order_item.save()
 
@@ -95,31 +93,11 @@ class ProductDetailView(FormView):
                 order_item.order = order
                 order_item.save()
 
-                # return super(ProductDetailView, self).form_valid(form)
             context = {
                 'order_item':order_item
             }
             messages.success(self.request, 'Product successfully added to cart!')
-            return render(self.request, 'store/partials/_item_quantity.html', context)
-    
-    def get_context_data(self, **kwargs):
-        context = super(ProductDetailView, self).get_context_data(**kwargs)
-        order = get_or_set_order_session(self.request)
-        order_item = None
-        try:
-            order_item = OrderItem.objects.get(
-            order=order,
-            product=self.get_object(),
-            size=None,    
-        )
-        except OrderItem.DoesNotExist:
-            pass
-        context.update({
-            'order_item':order_item,
-            'product':self.get_object()
-        })
-
-        return context
+        return render(self.request, 'store/partials/_item_quantity.html', context)
     
     def get(self, request, *args, **kwargs):
         """
@@ -129,9 +107,7 @@ class ProductDetailView(FormView):
         if self.request.htmx:
             order = get_or_set_order_session(self.request)
             order_item_id = self.request.GET.get('order_item_id')
-            print(order_item_id)
             size_id = self.request.GET.get('size_id')
-            print(size_id)
             order_item = None
             try:
                 order_item = OrderItem.objects.get(
@@ -156,10 +132,24 @@ class ProductDetailView(FormView):
         )
         except OrderItem.DoesNotExist:
             pass
-       
+        
+        reviews = Review.objects.select_related(
+            'user', 'order','product') \
+            .filter(product=self.get_object(), 
+            order__ordered=True, reviewed=True)[:5]
+
+        product_gallery = None
+
+        try:
+            product_gallery = ProductGallery.objects.filter(product=self.get_object())
+        except ProductGallery.DoesNotExist:
+            pass
+
         context = {
+            'reviews': reviews,
             'order_item':order_item,
             'product':self.get_object(),
+            'product_gallery':product_gallery,
         }
         return render(self.request, 'store/product_detail.html', context)
     
@@ -234,8 +224,16 @@ class RemoveOrderItemView(View):
             messages.success(request, 'Item successfully removed from cart!')
             return render(request, 'store/partials/_cart.html', context)
 
+class AddToCartVariationBtnView(View):
+    
+    def get(self, request, *args, **kwargs):
+        if request.htmx:
+            order_item_id = request.GET.get('order_item_id')
+            size_id = request.GET.get('size_id')
 
-class CheckOutView(LoginRequiredMixin, FormView):
+            return render(request, 'store/partials/_variation_btn.html')
+
+class CheckOutView(LoginRequiredMixin, CheckOrderTotalPrice, FormView):
     template_name = 'store/checkout.html'
     form_class = AddressForm
 
@@ -245,14 +243,17 @@ class CheckOutView(LoginRequiredMixin, FormView):
         address = None
         try:
             address = Address.objects.filter(user=self.request.user)[0]
+            # if address.exists():
+            #     address = address[0]
         except Address.DoesNotExist:
-            pass
+            address, _ = Address.objects.get_or_create(user=self.request.user)
         if address is not None:
             form.fields['address_line_1'].initial = address.address_line_1
             form.fields['address_line_2'].initial = address.address_line_2
             form.fields['city'].initial = address.city
             form.fields['state'].initial = address.state
             form.fields['zip_code'].initial = address.zip_code
+            form.fields['phone'].initial = address.phone
 
         return form
 
@@ -266,6 +267,7 @@ class CheckOutView(LoginRequiredMixin, FormView):
         address.zip_code = form.cleaned_data['zip_code']
         address.city=form.cleaned_data['city']
         address.state=form.cleaned_data['state']
+        address.phone=form.cleaned_data['phone']
         address.save()
         order.address = address
         
@@ -280,19 +282,9 @@ class CheckOutView(LoginRequiredMixin, FormView):
         context = super(CheckOutView, self).get_context_data(**kwargs)
         context['order'] = get_or_set_order_session(self.request)
         return context
-    
-
-class AddToCartVariationBtnView(LoginRequiredMixin, View):
-    
-    def get(self, request, *args, **kwargs):
-        if request.htmx:
-            order_item_id = request.GET.get('order_item_id')
-            size_id = request.GET.get('size_id')
-
-            return render(request, 'store/partials/_variation_btn.html')
 
 
-class PaymentView(LoginRequiredMixin, TemplateView):
+class PaymentView(LoginRequiredMixin, CheckOrderTotalPrice,  TemplateView):
     template_name = 'store/payment.html'
 
     def get_context_data(self, **kwargs):
@@ -305,27 +297,27 @@ class PaymentView(LoginRequiredMixin, TemplateView):
         return context
     
 
-class ConfirmOrderView(LoginRequiredMixin, View):
+class ConfirmOrderView(LoginRequiredMixin,CheckOrderTotalPrice, View):
 
     def post(self, request, *args, **kwargs):
-        order = Order.objects.filter(user=request.user, ordered=False).first()
+        order = Order.objects.get(user=request.user, ordered=False)
         body = json.loads(request.body)
         order.ordered = True
         order.ordered_date = timezone.now()
-        # print(body)
-        Payment.objects.create(
+        order.save()
+
+        payment = Payment.objects.create(
             order=order,
             successful=True,
             raw_response =json.dumps(body),
             amount=float(body['purchase_units'][0]['amount']['value']),
             payment_method="PayPal",
         )
-
-        order.save()
-
+        payment.save()
+        
         return JsonResponse({'data':'success'})
     
-class PaymentCompleteView(LoginRequiredMixin,TemplateView):
+class PaymentCompleteView(LoginRequiredMixin, TemplateView):
     template_name = 'store/payment_complete.html'
 
     def get_context_data(self, **kwargs):
@@ -333,11 +325,9 @@ class PaymentCompleteView(LoginRequiredMixin,TemplateView):
         order = Order.objects.filter(
             user=self.request.user,
             ordered=True
-        )[0]
-        payment = Payment.objects.filter(
-            order=order,
-            successful=True
-        )[0]
+        ).first()
+        
+        payment = Payment.objects.filter(order=order,successful=True).first()
         context = {
             'payment': payment,
         } 

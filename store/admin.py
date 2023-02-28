@@ -1,8 +1,10 @@
+import admin_thumbnails
 from django.contrib import admin
+from django.utils.html import format_html
 from store.models import (
     Category, Order, OrderItem, 
     Payment, Product, SizeVariation,
-    ColorVariation
+    ColorVariation, ProductGallery
 )
 @admin.register(SizeVariation)
 class SizeVariationAdmin(admin.ModelAdmin):
@@ -22,6 +24,25 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ['created_at','updated_at']
     search_fields = ['name']
 
+@admin.register(ProductGallery)
+class ProductGalleryAdmin(admin.ModelAdmin):
+    
+    def thumbnail(self, object):
+        img = object.image_url
+        return format_html('<img src="{0}" width="60"/>', img)
+    thumbnail.short_description = 'Profile Gallery thumbnail'
+    
+    list_display = ['thumbnail', 'product']
+    list_select_related = ['product']
+    search_fields = ['product__title']
+    autocomplete_fields = ['product']
+    list_filter = ['created_at', 'updated_at']
+    date_hierarchy = 'created_at'
+
+@admin_thumbnails.thumbnail('image', background=True)
+class ProductGalleryInline(admin.TabularInline):
+    model = ProductGallery
+    extra = 1
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -31,6 +52,8 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name']
     # filter_horizontal = ['categories', 'available_sizes', 'available_colors']
     filter_horizontal = ['categories', 'available_sizes']
+
+    inlines = [ProductGalleryInline]
 
     
 

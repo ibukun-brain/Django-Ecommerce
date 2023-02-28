@@ -1,0 +1,62 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+{% block stylesheets %}
+    {{block.super}}
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet" type="text/css" />
+{% endblock stylesheets %}
+{% block title %}Ratings and Reviews{% endblock title %}
+
+{% block body %}
+<section class="section-conten padding-y bg" >
+    {% include 'partials/_messages.html' %}
+    <div class="container">
+        <div class="row">
+            {% include 'partials/_dashboard_side_bar.html' %}
+        <main class="col-md-9" id="dashboardRight">
+            <article class="card">
+                {% if reviews %}
+                    <header class="card-header">
+                        <strong class="d-inline-block mr-3">Pending Review{{reviews_count|pluralize}}: ({{reviews_count}})</strong>
+                    </header>
+                {% endif %}
+                <div class="card-body">
+                    <div class="container-fluid mb-4">
+                        {% comment %} <div class="row">  {% endcomment %}
+                            {% for review in reviews %}
+                                <div class="card col-sm-12 mt-3">
+                                    <div class="card-body">
+                                       <div class="row d-flex">
+                                            <div class="col-2">
+                                                <img class="" src="{{review.product.image_url}}" width="80px" />
+                                            </div>
+                                            <div class="col-7">
+                                                {{review.product.name}} <br><br>
+
+                                                <span>{{review.order}}</span><br>
+                                                <span class="text-secondary">Delivered on:</span>
+                                            </div>
+                                            <div class="col-3 text-right">
+                                                <a href="" hx-get="{% url 'review:review-detail' review.pk %}" hx-target="#dashboardRight" class="btn btn-sm btn-primary ">RATE THIS PRODUCT</a>
+                                            </div>
+                                       </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <span>You have no pending Reviews at the moment</span>
+                        </div>
+                            {% endfor %}
+                            
+                        {% comment %} </div> <!-- row.// --> {% endcomment %}
+
+                    </div>
+                    {% include 'partials/_pagination.html' %}
+
+                </div> <!-- card-body .// -->
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+</section>
+{% endblock body %}

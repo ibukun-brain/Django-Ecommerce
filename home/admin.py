@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
 
 from home.models import Address, CustomUser
 
@@ -18,6 +19,7 @@ class CustomUserAdmin(UserAdmin):
                     "username",
                     "first_name",
                     "last_name",
+                    "profile_pic",
                     "email",
                     "mobile_no",
                 )
@@ -42,12 +44,17 @@ class CustomUserAdmin(UserAdmin):
             "classes": (
                 "wide",), "fields": (
                 "password1", "password2"), },), )
+    
+    def thumbnail(self, object):
+        img = object.image_url
+        return format_html('<img src="{0}" width="30"/>', img)
+    thumbnail.short_description = 'Profile image'
     list_display = [
+        "thumbnail",
         "first_name",
         "last_name",
         "email",
         "username",
-        "mobile_no",
         "is_superuser",
         "is_staff",
     ]

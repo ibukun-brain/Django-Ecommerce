@@ -15,10 +15,10 @@
                     <h4 class="card-title mb-4">Contact info</h4>
                         <div class="">
                             <span>Name: {{request.user.get_full_name}}</span><br>
-                            <span>Phone: {{request.user.mobile_no}}</span><br>
+                            <span>Phone: {{order.address.phone}}</span><br>
                             <span>Email: {{request.user.email}}</span><br>
                             <span>Address 1: {{order.address.address_line_1}}</span><br>
-                            {% if order.user.address.address_line_2 %}<span>Address 2: {{order.user.address.address_line_2}}</span>{% endif %}
+                            {% if order.user.address.address_line_2 %}<span>Address 2: {{order.address.address_line_2}}</span>{% endif %}
                             <span>City: {{order.address.city}}</span><br>
                             <span>State: {{order.address.state}}</span><br>
                             <span>Zip code: {{order.address.zip_code}}</span><br>

@@ -31,7 +31,7 @@ class CustomUser(AbstractUser):
         if self.profile_pic: 
             return self.profile_pic.url
 
-        return f"{settings.MEDIA_URL}/default/placeholder.jpg"
+        return f"{settings.STATIC_URL}images/avatars/placeholder.jpg"
     
 
 class Address(TimeBasedModel):
@@ -44,6 +44,7 @@ class Address(TimeBasedModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=20)
+    phone = models.CharField(max_length=11)
     # address_type = models.CharField(
     #     max_length=20,
     #     choices=AddressChoices.choices,

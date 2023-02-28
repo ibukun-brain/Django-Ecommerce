@@ -1,52 +1,45 @@
-from django.utils.html import format_html
+from django.utils.safestring import SafeString
 
-def image_to_html(image, username):
+
+def rating_to_html(value, show_rating=True):
     """
-    Render image to html img tag or jdenticon if no image exit
-    """
-
-    if image is None:
-        html_svg_tag = f'<img class="avatar-img rounded user-pic" src="https://avatars.dicebear.com/api/jdenticon/{username}.svg"/>'
-        return format_html(html_svg_tag)
-        
-    html_image_tag = f'<img src="{image}" class="avatar-img rounded user-pic">'
-
-    return format_html(html_image_tag)
-
-def image_to_html_profile(image, username):
-    """
-    Render image to html img tag or jdenticon if no image exit
-    """
-    if image is None:
-        html_svg_tag = f'<img class="avatar-img user-pic rounded-circle border border-white border-3" src="https://avatars.dicebear.com/api/jdenticon/{username}.svg" data-bs-toggle="modal" data-bs-target="#modalUploadProfilePic" title="Upload profile image" alt=""/>'
-        return format_html(html_svg_tag)
-        
-    html_image_tag = f'<img src="{image}" class="avatar-img user-pic rounded-circle border border-white border-3" title="Upload profile image" data-bs-toggle="modal" data-bs-target="#modalUploadProfilePic" title="Upload profile image" alt="" />'
-
-    return format_html(html_image_tag)
-
-def image_to_html_edit(image, username):
-    """
-    Render image to html img tag or jdenticon if no image exit
+    Converts rating to html font-awesome icon
     """
 
-    if image is None:
-        html_svg_tag = f'<img src="https://avatars.dicebear.com/api/jdenticon/{username}.svg"  id="image" />'
-        return format_html(html_svg_tag)
-        
-    html_image_tag = f'<img src="{image}" id="image" >'
+    rating_num = ""
 
-    return format_html(html_image_tag)
+    if not value:
+        return SafeString("<strong>Not yet rated</strong>")
 
-def image_to_html_small(image, username):
-    """
-    Render image to html img tag or jdenticon if no image exit
-    """
+    value = round(value, 1)
 
-    if image is None:
-        html_svg_tag = f'<img class="avatar-img rounded-circle user-pic" src="https://avatars.dicebear.com/api/jdenticon/{username}.svg" />'
-        return format_html(html_svg_tag)
-        
-    html_image_tag = f'<img src="{image}" class="avatar-img user-pic rounded-circle" />'
+    integer, remainder = divmod(value, 1)
+    html_rating = '<ul class="list-inline">'
 
-    return format_html(html_image_tag)
+    for _ in range(int(integer)):
+        html_rating += (
+            '<li class="list-inline-item me-0 small">'
+            + '<i class="fas fa-star text-warning"></i></li>'
+        )
+
+    if show_rating:
+        rating_num = f"{value}/5.0"
+
+    if remainder > 0.5:
+        html_rating += (
+            '<li class="list-inline-item me-0 small">'
+            + f'<i class="fas fa-star text-warning"></i>{rating_num}</li>'
+        )
+
+    elif remainder > 0:
+        html_rating += (
+            '<li class="list-inline-item me-0 small">' +
+            f'<i class="fas fa-star-half-alt text-warning">\
+                </i>{rating_num}</li>'
+        )
+    else:
+        html_rating += f"&nbsp;{rating_num}"
+
+    html_rating += "</ul>"
+
+    return SafeString(html_rating)

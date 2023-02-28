@@ -41,6 +41,9 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 
+ACCOUNT_FORMS = {
+    'signup': 'home.forms.SignupForm',
+}
 
 def ACCOUNT_USER_DISPLAY(user):
     """

@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.text import slugify
+from review.models import Review
 from store.models import Category, Order, OrderItem, Payment, Product
 from home.models import CustomUser
 from store.helpers import get_or_set_order_session
@@ -82,8 +83,20 @@ def check_logged_in_user(sender, request, **kwargs):
 
 
 @receiver(post_save, sender=Payment)
-def send_mail_after_payment(sender, instance, created, **kwargs):
+def send_mail_after_payment_and_create_pending_review(
+    sender, instance, created, **kwargs
+):
     if created:
+        orderitems = instance.order.orderitem_set.all() 
+
+        for orderitem in orderitems:
+
+            Review.objects.create(
+                user=instance.order.user,
+                product=orderitem.product,
+                order=instance.order
+            )      
+
         mail_subject='Your order has been received'
         html_template = 'store/email/order_email.html'
         from_email='info@buyit.com'
@@ -95,3 +108,5 @@ def send_mail_after_payment(sender, instance, created, **kwargs):
         mail = EmailMessage(mail_subject, html_message, from_email, to=recipient_list)
         mail.content_subtype = 'html'
         mail.send()
+
+  

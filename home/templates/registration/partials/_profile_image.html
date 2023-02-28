@@ -1,0 +1,5 @@
+<div class="text-right" id="profileImage">
+    <img src="{{request.user.image_url}}" width="80" class="rounded">
+    <input hx-post="{% url 'home:update-image' %}" hx-target="#profileImage" hx-encoding="multipart/form-data" hx-trigger="changed" id="profile_pic" class="form-control d-none" type="file" name="profile_pic" accept="image/*">
+    <label class="btn btn-primary btn-sm" for="profile_pic">Upload Photo</label>
+</div>

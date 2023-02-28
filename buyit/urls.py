@@ -21,8 +21,10 @@ from django.urls import path, include
 urlpatterns = [
     path('buyit/', include('user_sessions.urls', 'user_sessions')),
     path('accounts/', include('allauth.urls')),
-    path('admin/', admin.site.urls),
+    path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
+    path('buyit-admin/', admin.site.urls),
     path('store/', include('store.urls', namespace='store')),
+    path('', include('review.urls', namespace='review')),
     path('', include('home.urls', namespace='home')),
 ]
 

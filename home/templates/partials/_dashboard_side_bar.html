@@ -1,0 +1,27 @@
+<aside class="col-md-3">
+    <!--   SIDEBAR   -->
+    <ul class="list-group">
+        <a class="list-group-item" href="{% url 'home:dashboard' %}"> Dashboard </a>
+        <a class="list-group-item" href="{% url 'home:myorder' %}">My Orders </a>
+        <a class="list-group-item" href=""> Address Book </a>
+        <a class="list-group-item" href="{% url 'review:review-list' %}"> Pending Reviews </a>
+        {% comment %} <a class="list-group-item" href=""> Return and refunds </a> {% endcomment %}
+        {% comment %} <a class="list-group-item" href="">Settings </a> {% endcomment %}
+        <a class="list-group-item" href="{% url 'home:edit-profile' %}">Edit Profile </a>
+        <a class="list-group-item {% if 'change' in request.path %}active{% endif %}" href="{% url 'account_set_password' %}">Change Password</a>
+
+        {% comment %} <a class="list-group-item" href=""> My Selling Items </a> {% endcomment %}
+        {% comment %} <a class="list-group-item" href=""> Received orders </a> {% endcomment %}
+    </ul>
+    <br>
+    <a class="btn btn-light btn-block" href="{% url 'account_logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a> 
+    <!--   SIDEBAR .//END   -->
+</aside>
+
+{% comment %} <script type="text/javascript">
+    const dashboardLinks = document.querySelectorAll(".list-group-item > a");
+	dashboardLinks.forEach((dashboardLink)=>{
+		dashboardLink.classList.add("active")
+	})
+
+</script> {% endcomment %}

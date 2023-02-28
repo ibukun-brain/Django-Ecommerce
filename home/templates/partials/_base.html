@@ -8,8 +8,8 @@
 {% include 'partials/_stylesheets.html' %}
 {% block stylesheets %}{% endblock stylesheets %}
 <title>GreatKart | {% block title %}{% endblock title %}</title>
-
 </head>
+{% block styles %}{% endblock styles %}
 <body>
     {% include 'partials/_navbar.html' %}
     <main class="main-container">
@@ -22,9 +22,8 @@
 
     {% include 'partials/_footer.html' %}
 </body>
-    {% block scripts %}
-    {% endblock scripts %}
     {% include 'partials/_scripts.html' %}
-
-
+    {% block scripts %}
+    
+    {% endblock scripts %}
 </html>

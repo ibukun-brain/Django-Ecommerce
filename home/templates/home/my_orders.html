@@ -1,0 +1,26 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock title %}
+
+{% block body %}
+<section class="section-conten padding-y bg">
+
+    <div class="container">
+        <div class="row">
+            {% include 'partials/_dashboard_side_bar.html' %}
+            <main class="col-md-9" id="dashboardRight">
+                <article class="card">
+                <header class="card-header">
+                    <strong class="d-inline-block">Your order history</strong>
+                </header>
+                {% include 'partials/_my_orders.html' %}
+        
+        </article> <!-- order-group.// --> 
+    </main>
+    </div> <!-- row.// -->
+    </div>
+
+    
+</section>
+
+{% endblock body %}

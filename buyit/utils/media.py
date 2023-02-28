@@ -1,6 +1,9 @@
 def store_image_upload_path(instance, file_name):
     return f"{instance._meta.app_label}/{instance._meta.model_name}/{instance.name}/{file_name}"
 
+def store_product_gallery_upload_path(instance, file_name):
+    return f"{instance._meta.app_label}/{instance._meta.model_name}/{instance.product.name}/{file_name}"
+
 def profile_image_upload_path(instance, file_name):
     # file_folder = "Books"
     return f"{instance._meta.app_label}/{instance._meta.model_name}/{instance.get_full_name()}/{file_name}"

@@ -1,14 +1,13 @@
 from django.contrib.auth.mixins import AccessMixin
-from home.models import CustomUser
-
 from django.shortcuts import redirect
+from home.models import CustomUser
+from store.models import Order
 
-class IsSelf(AccessMixin):
+
+class CheckOrderTotalPrice(AccessMixin):
     
     def dispatch(self, request, *args, **kwargs):
-        slug = kwargs.get('slug')
-        user = CustomUser.objects.get(slug=slug)
-        if request.user != user:
-            # return redirect('users:user-profile', user)
+        order = Order.objects.filter(user=request.user, ordered=False)[0]
+        if order.get_overall_price <= 0:
             return redirect('/')
-        return super(IsSelf, self).dispatch(request, *args, **kwargs)
+        return super(CheckOrderTotalPrice, self).dispatch(request, *args, **kwargs)

@@ -1,0 +1,35 @@
+
+    <div class="card-body">
+        {% if myorders %}
+        <div class="col-md-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Order #</th>
+                        <th scope="col">Billing Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Order Total</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in myorders %}
+                        <tr>
+                            <th scope="row"><a href="{% url 'home:myorder-detail' order.pk %}">{{order}}</a></th>
+                            <td>{{order.address.user}}</td>
+                            <td>{{order.address.phone}}</td>
+                            <td>₦{{order.get_overall_price}}</td>
+                            <td>{{order.ordered_date}}</td>
+                        </td>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% include 'partials/_pagination.html' %}
+        </div>
+        {% else %}
+        <span>You have no orders yet</span>
+        {% endif %}
+        
+        </div> <!-- row.// -->
+        
+    </div> <!-- card-body .// -->

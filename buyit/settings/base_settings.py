@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from buyit.settings.packages.all_auth_settings import *
+from buyit.settings.packages.django_admin_thumbnails import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3mw+y#8j8e4*9z2g!itddgt1$5ykqi^p@+i3-+p)mwhih3zuyv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,23 +38,27 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.humanize',
 
     'home',
+    'review',
     'store',
 
+    'admin_honeypot',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'user_sessions',
-    'django_htmx'
+    'django_htmx',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # 'django.contrib.sessions.middleware.SessionMiddleware'
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'user_sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,6 +67,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
 ]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = 'user_sessions.backends.db'
@@ -146,3 +153,10 @@ AUTH_USER_MODEL = 'home.CustomUser'
 LOGIN_REDIRECT_URL = reverse_lazy('home:index')
 
 TIME_ZONE = 'Africa/Lagos'
+
+STATIC_URL = 'assets/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'assets'
+]
+STATIC_ROOT = BASE_DIR / 'static_root'
+

@@ -5,7 +5,11 @@
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{page_obj.previous_page_number}}&q={{request.GET.q}}">&laquo;</a>
+                    {% comment %} {% if 'myorders' in request.path %} {% endcomment %}
+                        {% comment %} <a class="page-link" hx-get="{% url 'home:paginate_myorder' %}?page={{page_obj.previous_page_number}}&q={{request.GET.q}}" hx-target="#dashboardRight" href="">&laquo;</a> {% endcomment %}
+                    {% comment %} {% else %} {% endcomment %}
+                        <a class="page-link" href="?page={{page_obj.previous_page_number}}&q={{request.GET.q}}">&laquo;</a>
+                    {% comment %} {% endif %} {% endcomment %}
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -16,11 +20,19 @@
             {% for i in page_obj.paginator.page_range %}
                 {% if page_obj.number == i %}
                     <li class="page-item active">
-                        <a class="page-link" href="?page={{i}}&q={{request.GET.q}}">{{i}}</a>
+                        {% comment %} {% if 'myorders' in request.path %} {% endcomment %}
+                            {% comment %} <a class="page-link" hx-get="?page={{i}}&q={{request.GET.q}}" hx-target="#dashboardRight" href="">{{i}}</a> {% endcomment %}
+                        {% comment %} {% else %} {% endcomment %}
+                            <a class="page-link" href="?page={{i}}&q={{request.GET.q}}">{{i}}</a>
+                        {% comment %} {% endif %} {% endcomment %}
                     </li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{i}}&q={{request.GET.q}}">{{i}}</a>
+                        {% comment %} {% if 'myorders' in request.path %} {% endcomment %}
+                            {% comment %} <a class="page-link" hx-get="?page={{i}}&q={{request.GET.q}}" hx-target="#dashboardRight" href="">{{i}}</a> {% endcomment %}
+                        {% comment %} {% else %} {% endcomment %}
+                            <a class="page-link" href="?page={{i}}&q={{request.GET.q}}">{{i}}</a>
+                        {% comment %} {% endif %} {% endcomment %}
                     </li>
                 {% endif %}
             {% endfor %}
